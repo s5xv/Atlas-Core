@@ -317,10 +317,11 @@ async function createTicket(interaction, gc, info) {
   if (validId(gc.category_id)) chOpts.parent = gc.category_id;
   const ch = await interaction.guild.channels.create(chOpts);
   u.tickets.set(ch.id, interaction.guild.id);
-  const embed = new EmbedBuilder().setColor(gc.color).setTitle('Ticket').setDescription(info || gc.ticket_text);
+  const embed = new EmbedBuilder().setColor(gc.color).setTitle('Ticket - ' + (interaction.user.username)).setDescription(info || gc.ticket_text);
   const close = new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setStyle(ButtonStyle.Danger);
   const claim = new ButtonBuilder().setCustomId('claim_ticket').setLabel('Claim').setStyle(ButtonStyle.Primary);
-  await ch.send({ content: '<@' + uid + '>', embeds: [embed], components: [new ActionRowBuilder().addComponents(claim, close)] });
+  const rolePing = validId(gc.staff_role_id) ? ' <@&' + gc.staff_role_id + '>' : '';
+  await ch.send({ content: '<@' + uid + '>' + rolePing, embeds: [embed], components: [new ActionRowBuilder().addComponents(claim, close)] });
   resetTicketAutoClose(ch.id, gc);
   return ch;
 }
@@ -633,12 +634,12 @@ async function handlePrefix(message) {
         if (sub === 'setup') {
           const existing = [...u.honeypots.keys()].find(cid => message.guild.channels.cache.get(cid));
           if (existing) return pd(message.channel, 'Honeypot already exists.', 5000);
-          const chOpts = { name: 'glitch-exploit', type: ChannelType.GuildText };
+          const chOpts = { name: 'do-not-type-here-unless-u-wnt-to-be-banned', topic: 'Typing in this channel will result in an immediate ban. Do not interact.', type: ChannelType.GuildText };
           if (validId(gc.category_id)) chOpts.parent = gc.category_id;
           const ch = await message.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return pd(message.channel, 'Could not create channel.', 5000);
           u.honeypots.set(ch.id, message.guild.id);
-          await ch.send('Welcome! Type anything to claim your prize.').catch(() => {});
+          await ch.send('You have been banned for typing in this channel. Appeal via ticket if this was a mistake.').catch(() => {});
           pd(message.channel, 'Honeypot created: ' + ch.toString(), 10000);
         } else if (sub === 'remove') {
           const cid = [...u.honeypots.keys()].find(cid => message.guild.channels.cache.get(cid)?.guild?.id === message.guild.id);
@@ -1008,12 +1009,12 @@ async function handleSlash(interaction) {
         if (sub === 'setup') {
           const existing = [...u.honeypots.keys()].find(cid => interaction.guild.channels.cache.get(cid));
           if (existing) return interaction.editReply({ content: 'Honeypot already exists.' });
-          const chOpts = { name: 'glitch-exploit', type: ChannelType.GuildText };
+          const chOpts = { name: 'do-not-type-here-unless-u-wnt-to-be-banned', topic: 'Typing in this channel will result in an immediate ban. Do not interact.', type: ChannelType.GuildText };
           if (validId(gc.category_id)) chOpts.parent = gc.category_id;
           const ch = await interaction.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return interaction.editReply({ content: 'Could not create channel.' });
           u.honeypots.set(ch.id, interaction.guild.id);
-          await ch.send('Welcome! Type anything to claim your prize.').catch(() => {});
+          await ch.send('You have been banned for typing in this channel. Appeal via ticket if this was a mistake.').catch(() => {});
           await interaction.editReply({ content: 'Honeypot created: ' + ch.toString() });
         } else if (sub === 'remove') {
           const cid = [...u.honeypots.keys()].find(cid => interaction.guild.channels.cache.get(cid)?.guild?.id === interaction.guild.id);
