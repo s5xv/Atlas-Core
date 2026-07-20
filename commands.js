@@ -313,6 +313,7 @@ async function createTicket(interaction, gc, info) {
     { id: uid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
   ];
   if (validId(gc.staff_role_id)) overwrites.push({ id: gc.staff_role_id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] });
+  else u.findStaffRoles(interaction.guild).forEach(rid => overwrites.push({ id: rid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }));
   const chOpts = { name: 'ticket-' + sanitized, type: ChannelType.GuildText, permissionOverwrites: overwrites };
   if (validId(gc.category_id)) chOpts.parent = gc.category_id;
   const ch = await interaction.guild.channels.create(chOpts);
@@ -320,7 +321,7 @@ async function createTicket(interaction, gc, info) {
   const embed = new EmbedBuilder().setColor(gc.color).setTitle('Ticket - ' + (interaction.user.username)).setDescription(info || gc.ticket_text);
   const close = new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setStyle(ButtonStyle.Danger);
   const claim = new ButtonBuilder().setCustomId('claim_ticket').setLabel('Claim').setStyle(ButtonStyle.Primary);
-  const rolePing = validId(gc.staff_role_id) ? ' <@&' + gc.staff_role_id + '>' : '';
+  const rolePing = validId(gc.staff_role_id) ? ' <@&' + gc.staff_role_id + '>' : (u.findStaffRoles(interaction.guild)[0] ? ' <@&' + u.findStaffRoles(interaction.guild)[0] + '>' : '');
   await ch.send({ content: '<@' + uid + '>' + rolePing, embeds: [embed], components: [new ActionRowBuilder().addComponents(claim, close)] });
   resetTicketAutoClose(ch.id, gc);
   return ch;
@@ -1175,7 +1176,8 @@ async function handleButton(interaction) {
     const logCh = interaction.guild.channels.cache.get(gc.log_channel_id);
     if (logCh && lines.length) logCh.send({ content: 'Ticket closed: #' + ch.name, files: [{ attachment: Buffer.from(lines.join('\n'), 'utf-8'), name: 'transcript-' + ch.name + '.txt' }] }).catch(() => {});
     u.tickets.delete(ch.id); u.ticketTimeouts.delete(ch.id); u.ticketPriority.delete(ch.id);
-    const uid = ch.permissionOverwrites.cache.find(o => o.type === 1 && o.id !== interaction.user.id && (!validId(gc.staff_role_id) || o.id !== gc.staff_role_id))?.id;
+    const staffRoleIds = validId(gc.staff_role_id) ? [gc.staff_role_id] : u.findStaffRoles(interaction.guild);
+    const uid = ch.permissionOverwrites.cache.find(o => o.type === 1 && o.id !== interaction.user.id && !staffRoleIds.includes(o.id))?.id;
     await ch.delete().catch(() => {});
     if (uid) { try { const user = await interaction.client.users.fetch(uid); user.send('Your ticket in ' + gc.name + ' has been closed. Thank you.').catch(() => {}); } catch {} }
     try { await interaction.editReply({ content: 'Closed.' }); } catch {}

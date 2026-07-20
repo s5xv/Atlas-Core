@@ -25,14 +25,33 @@ function getGuildConfig(guildId) {
   return config.guilds[guildId] || null;
 }
 
+const STAFF_PERMS = [
+  PermissionsBitField.Flags.Administrator,
+  PermissionsBitField.Flags.ManageGuild,
+  PermissionsBitField.Flags.KickMembers,
+  PermissionsBitField.Flags.BanMembers,
+  PermissionsBitField.Flags.ModerateMembers,
+  PermissionsBitField.Flags.ManageMessages,
+  PermissionsBitField.Flags.ManageChannels,
+  PermissionsBitField.Flags.ManageRoles
+];
+
 function hasStaffPermission(member, guildConfig) {
   if (!guildConfig || !member) return false;
-  if (member.permissions.has(PermissionsBitField.Flags.Administrator)) return true;
-  if (member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return true;
+  if (member.permissions.any(STAFF_PERMS)) return true;
   if (guildConfig.staff_role_id && typeof guildConfig.staff_role_id === 'string' && guildConfig.staff_role_id.length > 5) {
     if (member.roles.cache.has(guildConfig.staff_role_id)) return true;
   }
   return false;
+}
+
+function findStaffRoles(guild) {
+  if (!guild) return [];
+  const roles = [];
+  guild.roles.cache.forEach(role => {
+    if (role.permissions.any(STAFF_PERMS)) roles.push(role.id);
+  });
+  return roles;
 }
 
 async function respond(interaction, content) {
@@ -151,6 +170,6 @@ module.exports = {
   antispam, tickets, ticketTimeouts, ticketPriority, warnings, warnCounters,
   commandStats, joinTimestamps, raidMode, countdowns, claimedTickets,
   pastes, notes, shadowbans,   honeypots, customPanels, customForms, pasteCounter,
-  getGuildConfig, hasStaffPermission, respond, parseDuration, formatDuration,
+  getGuildConfig, hasStaffPermission, findStaffRoles, respond, parseDuration, formatDuration,
   trackCommand, logAudit, eightball, jokes, trivia, asciiArts, priorities, timezones
 };

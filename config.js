@@ -54,7 +54,7 @@ module.exports = {
       name: "Demeter Realty", color: "#78281F", staff_role_id: "STAFF_ROLE_ID",
       member_role_id: "MEMBER_ROLE_ID", unverified_role_id: "UNVERIFIED_ROLE_ID",
       category_id: "1528865011412504576", ticket_panel_channel_id: "PANEL_CHANNEL_ID", log_channel_id: "1528840853903118336", audit_channel_id: "1528840853903118336",
-      listings_channel_id: "1528841128982351872",
+      listings_channel_id: "1528840976414539827",
       ticket_text: "Demeter Realty support. Let us know how we can assist you.",
       notification_roles: [
         { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
