@@ -173,8 +173,6 @@ const commands = [
 
   new SlashCommandBuilder().setName('deploy-panels').setDescription('Deploy all service panel embeds to their designated channels'),
 
-  new SlashCommandBuilder().setName('post').setDescription('Post a property listing (Demeter Realty only)'),
-
   new SlashCommandBuilder().setName('reload').setDescription('Reload bot configuration'),
   new SlashCommandBuilder().setName('presence').setDescription('Set bot presence')
     .addStringOption(o => o.setName('type').setDescription('Activity type')

@@ -1139,17 +1139,6 @@ async function handleSlash(interaction) {
         if (!sorted.length) return interaction.editReply({ content: 'No stats yet.' });
         await interaction.editReply({ content: '**Stats**\n' + sorted.map(([k, v]) => k + ': ' + v).join('\n') }); break;
       }
-      case 'post': {
-        if (interaction.guildId !== '1528809601674514502') return u.respond(interaction, 'This command is only available in Demeter Realty.');
-        const m = new ModalBuilder().setCustomId('post_modal').setTitle('Post a Property Listing');
-        m.addComponents(
-          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('prop_name').setLabel('Property Name').setStyle(TextInputStyle.Short).setRequired(true)),
-          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('price').setLabel('Price').setStyle(TextInputStyle.Short).setRequired(true)),
-          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('negotiable').setLabel('Negotiable? (Yes/No)').setStyle(TextInputStyle.Short).setRequired(true)),
-          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('location').setLabel('Location / Coordinates').setStyle(TextInputStyle.Short).setRequired(true)),
-          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('image').setLabel('Image Link (Imgur URL)').setStyle(TextInputStyle.Short).setRequired(false)));
-        return interaction.showModal(m);
-      }
       case 'sync': await interaction.deferReply(ereply); await interaction.editReply({ content: 'Run npm run deploy to resync.' }); break;
     }
   } catch (e) { console.error('Slash error:', e); }
@@ -1287,29 +1276,6 @@ async function handleModal(interaction) {
     const logCh = interaction.guild.channels.cache.get(gc.log_channel_id);
     if (logCh) logCh.send({ content: response }).catch(() => {});
     await interaction.editReply({ content: 'Form submitted.' });
-    return;
-  }
-
-  if (interaction.customId === 'post_modal') {
-    const name = interaction.fields.getTextInputValue('prop_name');
-    const price = interaction.fields.getTextInputValue('price');
-    const negotiable = interaction.fields.getTextInputValue('negotiable');
-    const location = interaction.fields.getTextInputValue('location');
-    const image = interaction.fields.getTextInputValue('image');
-    const e = new EmbedBuilder()
-      .setTitle('Property Listing: ' + name)
-      .setColor(gc.color)
-      .addFields(
-        { name: 'Price', value: price, inline: true },
-        { name: 'Negotiable', value: negotiable, inline: true },
-        { name: 'Location', value: location },
-        { name: 'Posted by', value: interaction.user.tag }
-      )
-      .setFooter({ text: TOS_FOOTER });
-    if (image) e.setImage(image);
-    const listingsCh = interaction.guild.channels.cache.get(gc.listings_channel_id || interaction.channelId);
-    if (listingsCh) await listingsCh.send({ embeds: [e] });
-    await interaction.editReply({ content: 'Listing posted.' });
     return;
   }
 
