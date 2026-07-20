@@ -7,6 +7,97 @@ const {
 const config = require('./config');
 const u = require('./utils');
 
+const CORE_RULES = 'No exploiting bugs, glitches, or duplication methods.\nMaintain professional conduct; no toxicity or harassment.\nFollow all staff instructions during active operations.';
+const TOS_FOOTER = 'All users must adhere to Discord TOS and DistrictRP TOS.';
+
+const GUILD_PANEL_CHANNELS = {
+  '1528793481273671832': '1528796269001183272',
+  '1528796628457361449': '1528799506122936502',
+  '1528800629701480468': '1528804258684735498',
+  '1528804420383674559': '1528807330433597451',
+  '1528807603197706332': '1528808770246021130',
+  '1528809601674514502': '1528841128982351872'
+};
+
+const F = (id, label, style = TextInputStyle.Short, required = true) => ({ id, label, style, required });
+const S = TextInputStyle.Short;
+const P = TextInputStyle.Paragraph;
+
+const PANELS = [
+  {
+    guildId: '1528793481273671832', color: 0xD4AF37,
+    title: 'Atlas Holdings Operations Desk',
+    description: 'Select an option below to open a ticket or submit an application.\n\n__**Core Rules**__\n' + CORE_RULES,
+    options: [
+      { label: 'Support / Enquiry', value: 'atlas_support', modalId: 'spm_atlas_support',
+        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
+      { label: 'Apply for Employment', value: 'atlas_employ', modalId: 'spm_atlas_employ',
+        fields: [F('ign', 'In-Game Name'), F('position', 'Position Applying For'), F('experience', 'Prior Experience', P), F('why_hire', 'Why hire you?', P), F('bring', 'What do you bring to the team?', P)] }
+    ]
+  },
+  {
+    guildId: '1528796628457361449', color: 0x2980B9,
+    title: 'Hermes Net Support Terminal',
+    description: 'Select an option below to contact network operators or apply.\n\n__**Core Rules**__\n' + CORE_RULES,
+    options: [
+      { label: 'Support / Enquiry', value: 'hermes_support', modalId: 'spm_hermes_support',
+        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
+      { label: 'Apply for Staff', value: 'hermes_staff', modalId: 'spm_hermes_staff',
+        fields: [F('ign', 'In-Game Name'), F('role', 'Desired Role'), F('experience', 'Prior Experience', P), F('why_hire', 'Why hire you?', P), F('bring', 'What do you bring to the team?', P)] }
+    ]
+  },
+  {
+    guildId: '1528800629701480468', color: 0x8E44AD,
+    title: 'Hecate Cards Help Desk',
+    description: 'Select an option below to submit an enquiry or referee application.\n\n__**Core Rules**__\n' + CORE_RULES,
+    options: [
+      { label: 'Support / Enquiry', value: 'hecate_support', modalId: 'spm_hecate_support',
+        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
+      { label: 'Apply for Referee', value: 'hecate_referee', modalId: 'spm_hecate_referee',
+        fields: [F('ign', 'In-Game Name'), F('playtime', 'How long have you played?'), F('experience', 'Prior Experience', P), F('why_you', 'Why do you want this role?', P), F('bring', 'What do you bring to the team?', P)] }
+    ]
+  },
+  {
+    guildId: '1528804420383674559', color: 0x1E4620,
+    title: 'Plutus Bank Customer Support',
+    description: 'Select an option below for vault assistance or teller applications.\n\n__**Core Rules**__\n' + CORE_RULES,
+    options: [
+      { label: 'Support / Enquiry', value: 'plutus_support', modalId: 'spm_plutus_support',
+        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
+      { label: 'Apply for Teller', value: 'plutus_teller', modalId: 'spm_plutus_teller',
+        fields: [F('ign', 'In-Game Name'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_work', 'Why work here?', P), F('bring', 'What do you bring to the team?', P)] }
+    ]
+  },
+  {
+    guildId: '1528807603197706332', color: 0x8B0000,
+    title: 'Nemesis Command Intake',
+    description: 'Select an option below to contact command, enlist, or book a session.\n\n__**Core Rules**__\n' + CORE_RULES,
+    options: [
+      { label: 'Support / Enquiry', value: 'nemesis_support', modalId: 'spm_nemesis_support',
+        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
+      { label: 'Enlistment Application', value: 'nemesis_enlist', modalId: 'spm_nemesis_enlist',
+        fields: [F('ign', 'In-Game Name'), F('combat_exp', 'Combat Experience Level'), F('factions', 'Prior Factions'), F('why_enlist', 'Why enlist?', P), F('bring', 'What do you bring to the team?', P)] },
+      { label: 'Book a Game Session', value: 'nemesis_session', modalId: 'spm_nemesis_session',
+        fields: [F('ign', 'In-Game Name'), F('session_type', 'Session Type'), F('datetime', 'Preferred Date/Time'), F('players', 'Player Count'), F('goals', 'Goals/Notes', P)] }
+    ]
+  },
+  {
+    guildId: '1528809601674514502', color: 0x78281F,
+    title: 'Demeter Realty Leasing Office',
+    description: 'Select an option below for land inquiries, applications, or plot trading.\n\n__**Core Rules**__\n' + CORE_RULES,
+    options: [
+      { label: 'Support / Enquiry', value: 'demeter_support', modalId: 'spm_demeter_support',
+        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
+      { label: 'Apply for Agent', value: 'demeter_agent', modalId: 'spm_demeter_agent',
+        fields: [F('ign', 'In-Game Name'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_agent', 'Why be an Agent?', P), F('bring', 'What do you bring to the team?', P)] },
+      { label: 'Buy a Plot', value: 'demeter_buy', modalId: 'spm_demeter_buy',
+        fields: [F('ign', 'In-Game Name'), F('location', 'Desired Location'), F('size', 'Plot Size'), F('budget', 'Budget'), F('use', 'Intended Use', P)] },
+      { label: 'Sell a Plot', value: 'demeter_sell', modalId: 'spm_demeter_sell',
+        fields: [F('ign', 'In-Game Name'), F('coords', 'Plot Coordinates'), F('price', 'Asking Price'), F('description', 'Property Description', P), F('screenshot', 'Screenshot Link', S, false)] }
+    ]
+  }
+];
+
 async function pd(channel, content, ttl) {
   const m = await channel.send(content);
   if (ttl) setTimeout(() => m.delete().catch(() => {}), ttl);
@@ -112,6 +203,13 @@ async function sendTicketHub(channel, gc) {
   return channel.send({ embeds: [e], components: [new ActionRowBuilder().addComponents(s)] });
 }
 
+async function sendServicePanel(channel, panel) {
+  const e = new EmbedBuilder().setTitle(panel.title).setDescription(panel.description).setColor(panel.color).setFooter({ text: TOS_FOOTER });
+  const select = new StringSelectMenuBuilder().setCustomId('sp_' + panel.guildId).setPlaceholder('Choose an option');
+  panel.options.forEach(o => select.addOptions(new StringSelectMenuOptionBuilder().setLabel(o.label).setDescription(o.label).setValue(o.value)));
+  return channel.send({ embeds: [e], components: [new ActionRowBuilder().addComponents(select)] });
+}
+
 async function sendRolePanel(channel, gc) {
   const roles = gc.notification_roles || [];
   if (!roles.length) return channel.send('No notification roles configured.');
@@ -191,7 +289,7 @@ async function handlePrefix(message) {
   if (!message.content.startsWith('!')) return;
   const args = message.content.slice(1).trim().split(/ +/);
   const cmd = args.shift().toLowerCase();
-  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'embed', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
+  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'embed', 'panel', 'form', 'deploy-panels', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
   if (STAFF.includes(cmd) && !u.hasStaffPermission(message.member, gc)) return message.reply('No permission.').then(r => setTimeout(() => r.delete().catch(() => {}), 4000)).catch(() => {});
   u.trackCommand(cmd);
   try {
@@ -551,6 +649,19 @@ async function handlePrefix(message) {
         } else pd(message.channel, 'Subcommands: create, field, list, delete.', 5000);
         break;
       }
+      case 'deploy-panels': {
+        const pc = PANELS.filter(p => p.guildId === message.guild.id);
+        if (!pc.length) return pd(message.channel, 'No panels configured for this server.', 5000);
+        for (const panel of pc) {
+          const chId = GUILD_PANEL_CHANNELS[panel.guildId];
+          if (!chId) { pd(message.channel, 'No channel configured for ' + panel.guildId, 5000); continue; }
+          const ch = message.guild.channels.cache.get(chId);
+          if (!ch) { pd(message.channel, 'Channel not found for panel.', 5000); continue; }
+          await sendServicePanel(ch, panel);
+        }
+        pd(message.channel, 'Panels deployed.', 5000);
+        break;
+      }
       case 'reload': {
         delete require.cache[require.resolve('./config')];
         Object.assign(config, require('./config'));
@@ -586,7 +697,7 @@ async function handleSlash(interaction) {
   const gc = u.getGuildConfig(interaction.guildId);
   if (!gc) return u.respond(interaction, 'Not configured.');
   const cmd = interaction.commandName;
-  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'embed', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
+  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'embed', 'panel', 'form', 'deploy-panels', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
   if (STAFF.includes(cmd) && !u.hasStaffPermission(interaction.member, gc)) return u.respond(interaction, 'No permission.');
   u.trackCommand(cmd);
   try {
@@ -911,6 +1022,20 @@ async function handleSlash(interaction) {
         }
         break;
       }
+      case 'deploy-panels': {
+        await interaction.deferReply(ereply);
+        const pc = PANELS.filter(p => p.guildId === interaction.guild.id);
+        if (!pc.length) return interaction.editReply({ content: 'No panels configured for this server.' });
+        for (const panel of pc) {
+          const chId = GUILD_PANEL_CHANNELS[panel.guildId];
+          if (!chId) continue;
+          const ch = interaction.guild.channels.cache.get(chId);
+          if (!ch) continue;
+          await sendServicePanel(ch, panel);
+        }
+        await interaction.editReply({ content: 'Panels deployed.' });
+        break;
+      }
       case 'reload': await interaction.deferReply(ereply); delete require.cache[require.resolve('./config')]; Object.assign(config, require('./config')); await interaction.editReply({ content: 'Reloaded.' }); break;
       case 'presence': {
         const type = parseInt(interaction.options.getString('type')); const name = interaction.options.getString('name');
@@ -927,6 +1052,17 @@ async function handleSlash(interaction) {
         await interaction.deferReply(ereply); const sorted = [...u.commandStats.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
         if (!sorted.length) return interaction.editReply({ content: 'No stats yet.' });
         await interaction.editReply({ content: '**Stats**\n' + sorted.map(([k, v]) => k + ': ' + v).join('\n') }); break;
+      }
+      case 'post': {
+        if (interaction.guildId !== '1528809601674514502') return u.respond(interaction, 'This command is only available in Demeter Realty.');
+        const m = new ModalBuilder().setCustomId('post_modal').setTitle('Post a Property Listing');
+        m.addComponents(
+          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('prop_name').setLabel('Property Name').setStyle(TextInputStyle.Short).setRequired(true)),
+          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('price').setLabel('Price').setStyle(TextInputStyle.Short).setRequired(true)),
+          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('negotiable').setLabel('Negotiable? (Yes/No)').setStyle(TextInputStyle.Short).setRequired(true)),
+          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('location').setLabel('Location / Coordinates').setStyle(TextInputStyle.Short).setRequired(true)),
+          new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('image').setLabel('Image Link (Imgur URL)').setStyle(TextInputStyle.Short).setRequired(false)));
+        return interaction.showModal(m);
       }
       case 'sync': await interaction.deferReply(ereply); await interaction.editReply({ content: 'Run npm run deploy to resync.' }); break;
     }
@@ -990,28 +1126,45 @@ async function handleButton(interaction) {
 
 async function handleSelectMenu(interaction) {
   const gc = u.getGuildConfig(interaction.guildId);
-  if (!gc || interaction.customId !== 'ticket_select') return u.respond(interaction, 'Not configured.');
+  if (!gc) return u.respond(interaction, 'Not configured.');
+  const id = interaction.customId;
   const val = interaction.values[0];
-  if (val === 'general') {
-    await interaction.deferReply({ ephemeral: true }); const ch = await createTicket(interaction, gc, null).catch(e => { interaction.editReply({ content: e.message }); return null; });
-    if (ch) await interaction.editReply({ content: 'Ticket created: ' + ch.toString() }); return;
+
+  if (id === 'ticket_select') {
+    if (val === 'general') {
+      await interaction.deferReply({ ephemeral: true }); const ch = await createTicket(interaction, gc, null).catch(e => { interaction.editReply({ content: e.message }); return null; });
+      if (ch) await interaction.editReply({ content: 'Ticket created: ' + ch.toString() }); return;
+    }
+    if (val === 'report') {
+      const m = new ModalBuilder().setCustomId('report_modal').setTitle('Report a Player');
+      m.addComponents(
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('player_name').setLabel('Player Name').setStyle(TextInputStyle.Short).setRequired(true)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('reason').setLabel('Reason for Report').setStyle(TextInputStyle.Paragraph).setRequired(true)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('evidence').setLabel('Evidence').setStyle(TextInputStyle.Paragraph).setRequired(false)));
+      return interaction.showModal(m);
+    }
+    if (val === 'apply') {
+      const m = new ModalBuilder().setCustomId('apply_modal').setTitle('Application Form');
+      m.addComponents(
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('position').setLabel('Position / Form Type').setStyle(TextInputStyle.Short).setRequired(true)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('experience').setLabel('Your Experience').setStyle(TextInputStyle.Paragraph).setRequired(true)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('why').setLabel('Why do you want this?').setStyle(TextInputStyle.Paragraph).setRequired(true)));
+      return interaction.showModal(m);
+    }
+    return u.respond(interaction, 'Unknown option.');
   }
-  if (val === 'report') {
-    const m = new ModalBuilder().setCustomId('report_modal').setTitle('Report a Player');
-    m.addComponents(
-      new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('player_name').setLabel('Player Name').setStyle(TextInputStyle.Short).setRequired(true)),
-      new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('reason').setLabel('Reason for Report').setStyle(TextInputStyle.Paragraph).setRequired(true)),
-      new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('evidence').setLabel('Evidence').setStyle(TextInputStyle.Paragraph).setRequired(false)));
-    return interaction.showModal(m);
+
+  if (id.startsWith('sp_')) {
+    const panel = PANELS.find(p => p.guildId === interaction.guildId);
+    if (!panel) return u.respond(interaction, 'Panel not found.');
+    const option = panel.options.find(o => o.value === val);
+    if (!option) return u.respond(interaction, 'Option not found.');
+    const modal = new ModalBuilder().setCustomId(option.modalId).setTitle(option.label);
+    option.fields.forEach(f => modal.addComponents(new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(f.id).setLabel(f.label).setStyle(f.style).setRequired(f.required))));
+    return interaction.showModal(modal);
   }
-  if (val === 'apply') {
-    const m = new ModalBuilder().setCustomId('apply_modal').setTitle('Application Form');
-    m.addComponents(
-      new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('position').setLabel('Position / Form Type').setStyle(TextInputStyle.Short).setRequired(true)),
-      new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('experience').setLabel('Your Experience').setStyle(TextInputStyle.Paragraph).setRequired(true)),
-      new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('why').setLabel('Why do you want this?').setStyle(TextInputStyle.Paragraph).setRequired(true)));
-    return interaction.showModal(m);
-  }
+
+  return u.respond(interaction, 'Unknown menu.');
 }
 
 async function handleModal(interaction) {
@@ -1047,6 +1200,42 @@ async function handleModal(interaction) {
     const logCh = interaction.guild.channels.cache.get(gc.log_channel_id);
     if (logCh) logCh.send({ content: response }).catch(() => {});
     await interaction.editReply({ content: 'Form submitted.' });
+    return;
+  }
+
+  if (interaction.customId === 'post_modal') {
+    const name = interaction.fields.getTextInputValue('prop_name');
+    const price = interaction.fields.getTextInputValue('price');
+    const negotiable = interaction.fields.getTextInputValue('negotiable');
+    const location = interaction.fields.getTextInputValue('location');
+    const image = interaction.fields.getTextInputValue('image');
+    const e = new EmbedBuilder()
+      .setTitle('Property Listing: ' + name)
+      .setColor(gc.color)
+      .addFields(
+        { name: 'Price', value: price, inline: true },
+        { name: 'Negotiable', value: negotiable, inline: true },
+        { name: 'Location', value: location },
+        { name: 'Posted by', value: interaction.user.tag }
+      )
+      .setFooter({ text: TOS_FOOTER });
+    if (image) e.setImage(image);
+    const listingsCh = interaction.guild.channels.cache.get(gc.listings_channel_id || interaction.channelId);
+    if (listingsCh) await listingsCh.send({ embeds: [e] });
+    await interaction.editReply({ content: 'Listing posted.' });
+    return;
+  }
+
+  if (interaction.customId.startsWith('spm_')) {
+    const panel = PANELS.find(p => p.guildId === interaction.guild.id);
+    if (!panel) return interaction.editReply({ content: 'Panel not found.' });
+    const option = panel.options.find(o => o.modalId === interaction.customId);
+    if (!option) return interaction.editReply({ content: 'Option not found.' });
+    let info = '**' + option.label + '**\nUser: ' + interaction.user.tag + '\n';
+    option.fields.forEach(f => info += '**' + f.label + ':** ' + (interaction.fields.getTextInputValue(f.id) || '*not provided*') + '\n');
+    const ch = await createTicket(interaction, gc, info).catch(e => { interaction.editReply({ content: e.message }); return null; });
+    if (ch) await interaction.editReply({ content: 'Ticket created: ' + ch.toString() });
+    return;
   }
 }
 
