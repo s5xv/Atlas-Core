@@ -12,7 +12,6 @@ const joinTimestamps = new Collection();
 const raidMode = new Collection();
 const countdowns = new Collection();
 const claimedTickets = new Collection();
-const suggestions = new Collection();
 const pastes = new Collection();
 const notes = new Collection();
 const shadowbans = new Set();
@@ -149,7 +148,7 @@ const timezones = {
 module.exports = {
   antispam, tickets, ticketTimeouts, ticketPriority, warnings, warnCounters,
   commandStats, joinTimestamps, raidMode, countdowns, claimedTickets,
-  suggestions, pastes, notes, shadowbans, honeypots, pasteCounter,
+  pastes, notes, shadowbans, honeypots, pasteCounter,
   getGuildConfig, hasStaffPermission, respond, parseDuration, formatDuration,
   trackCommand, logAudit, eightball, jokes, trivia, asciiArts, priorities, timezones
 };

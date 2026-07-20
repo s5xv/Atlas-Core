@@ -106,9 +106,6 @@ const commands = [
 
   new SlashCommandBuilder().setName('uptime').setDescription('Show bot uptime'),
 
-  new SlashCommandBuilder().setName('suggest').setDescription('Submit a suggestion')
-    .addStringOption(o => o.setName('text').setDescription('Your suggestion').setRequired(true)),
-
   new SlashCommandBuilder().setName('paste').setDescription('Create a paste')
     .addStringOption(o => o.setName('title').setDescription('Title').setRequired(true))
     .addStringOption(o => o.setName('content').setDescription('Content').setRequired(true)),

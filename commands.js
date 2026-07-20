@@ -388,18 +388,6 @@ async function handlePrefix(message) {
         break;
       }
       case 'uptime': pd(message.channel, 'Uptime: ' + u.formatDuration(process.uptime() * 1000), 15000); break;
-      case 'suggest': {
-        const txt = args.join(' '); if (!txt) return pd(message.channel, 'Provide suggestion text.', 5000);
-        const sch = message.guild.channels.cache.get(gc.suggestion_channel_id);
-        if (!sch) return pd(message.channel, 'Suggestion channel not configured.', 5000);
-        const embed = new EmbedBuilder().setTitle('Suggestion').setDescription(txt).setColor('#57F287').setFooter({ text: message.author.tag }).setTimestamp();
-        const up = new ButtonBuilder().setCustomId('suggest_up').setLabel('0').setStyle(ButtonStyle.Success).setEmoji('👍');
-        const down = new ButtonBuilder().setCustomId('suggest_down').setLabel('0').setStyle(ButtonStyle.Danger).setEmoji('👎');
-        const m = await sch.send({ embeds: [embed], components: [new ActionRowBuilder().addComponents(up, down)] });
-        u.suggestions.set(m.id, { guildId: message.guild.id, authorId: message.author.id, text: txt, upvotes: 0, downvotes: 0, voters: [] });
-        pd(message.channel, 'Suggestion posted in ' + sch.toString() + '.', 5000);
-        break;
-      }
       case 'paste': {
         const title = args[0];
         const content = args.slice(1).join(' ');
@@ -686,17 +674,6 @@ async function handleSlash(interaction) {
         setTimeout(() => { interaction.channel.send('Countdown finished: ' + msg); }, dur); break;
       }
       case 'uptime': await interaction.reply({ content: 'Uptime: ' + u.formatDuration(process.uptime() * 1000), ...ereply }); break;
-      case 'suggest': {
-        const txt = interaction.options.getString('text'); await interaction.deferReply(ereply);
-        const sch = interaction.guild.channels.cache.get(gc.suggestion_channel_id);
-        if (!sch) return interaction.editReply({ content: 'Suggestion channel not configured.' });
-        const embed = new EmbedBuilder().setTitle('Suggestion').setDescription(txt).setColor('#57F287').setFooter({ text: interaction.user.tag }).setTimestamp();
-        const up = new ButtonBuilder().setCustomId('suggest_up').setLabel('0').setStyle(ButtonStyle.Success).setEmoji('👍');
-        const down = new ButtonBuilder().setCustomId('suggest_down').setLabel('0').setStyle(ButtonStyle.Danger).setEmoji('👎');
-        const m = await sch.send({ embeds: [embed], components: [new ActionRowBuilder().addComponents(up, down)] });
-        u.suggestions.set(m.id, { guildId: interaction.guild.id, authorId: interaction.user.id, text: txt, upvotes: 0, downvotes: 0, voters: [] });
-        await interaction.editReply({ content: 'Suggestion posted in ' + sch.toString() + '.' }); break;
-      }
       case 'paste': {
         const title = interaction.options.getString('title'); const content = interaction.options.getString('content');
         await interaction.deferReply(ereply); u.pasteCounter++;
@@ -821,24 +798,6 @@ async function handleButton(interaction) {
     if (!role) return u.respond(interaction, 'Role not found on server.');
     if (interaction.member.roles.cache.has(role.id)) { await interaction.member.roles.remove(role).catch(() => {}); return u.respond(interaction, 'Removed ' + rd.label + '.'); }
     await interaction.member.roles.add(role).catch(() => {}); return u.respond(interaction, 'Added ' + rd.label + '.');
-  }
-  if (id === 'suggest_up' || id === 'suggest_down') {
-    await interaction.deferReply({ ephemeral: true });
-    const msg = interaction.message; const data = u.suggestions.get(msg.id);
-    if (!data) return interaction.editReply({ content: 'Suggestion data not found.' });
-    if (data.voters.includes(interaction.user.id)) return interaction.editReply({ content: 'You already voted.' });
-    data.voters.push(interaction.user.id);
-    if (id === 'suggest_up') data.upvotes++; else data.downvotes++;
-    u.suggestions.set(msg.id, data);
-    const embed = EmbedBuilder.from(msg.embeds[0]).setFooter({ text: interaction.message.embeds[0]?.footer?.text || '' });
-    const up = ButtonBuilder.from(msg.components[0].components[0]).setLabel(String(data.upvotes));
-    const down = ButtonBuilder.from(msg.components[0].components[1]).setLabel(String(data.downvotes));
-    await msg.edit({ embeds: [embed], components: [new ActionRowBuilder().addComponents(up, down)] }).catch(() => {});
-    if (data.upvotes >= config.suggestions.voteThreshold) {
-      const sch = interaction.guild.channels.cache.get(gc.suggestion_channel_id);
-      if (sch) sch.send('Suggestion reached ' + data.upvotes + ' upvotes! Threshold met.').catch(() => {});
-    }
-    return interaction.editReply({ content: 'Vote recorded.' });
   }
 }
 
