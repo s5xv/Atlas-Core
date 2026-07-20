@@ -652,7 +652,7 @@ async function handlePrefix(message) {
         break;
       }
       case 'embed': {
-        const title = args[0]; const desc = args.slice(1).join(' ');
+        const title = args[0]; const desc = args.slice(1).join(' ').replace(/\\n/g, '\n');
         if (!title || !desc) return pd(message.channel, 'Usage: !embed <title> <description>', 5000);
         const e = new EmbedBuilder().setTitle(title).setDescription(desc).setColor(gc.color);
         await message.channel.send({ embeds: [e] });
@@ -1027,7 +1027,7 @@ async function handleSlash(interaction) {
       case 'embed': {
         await interaction.deferReply(ereply);
         const title = interaction.options.getString('title');
-        const desc = interaction.options.getString('description');
+        const desc = interaction.options.getString('description').replace(/\\n/g, '\n');
         const color = interaction.options.getString('color') || null;
         const parsedColor = color ? parseInt(color.replace('#', ''), 16) : gc.color;
         const e = new EmbedBuilder().setTitle(title).setDescription(desc).setColor(parsedColor);
