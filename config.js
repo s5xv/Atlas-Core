@@ -1,0 +1,87 @@
+module.exports = {
+  guilds: {
+    "1528793481273671832": {
+      name: "Atlas Holdings", color: "#D4AF37", staff_role_id: "STAFF_ROLE_ID",
+      member_role_id: "MEMBER_ROLE_ID", unverified_role_id: "UNVERIFIED_ROLE_ID",
+      category_id: "CATEGORY_ID", log_channel_id: "LOG_CHANNEL_ID", audit_channel_id: "AUDIT_CHANNEL_ID",
+      suggestion_channel_id: "SUGGESTION_CHANNEL_ID",
+      ticket_text: "Atlas Holdings support. State your issue below and staff will help you.",
+      notification_roles: [
+        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
+        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+      ]
+    },
+    "1528796628457361449": {
+      name: "Hermes Net", color: "#2980B9", staff_role_id: "STAFF_ROLE_ID",
+      member_role_id: "MEMBER_ROLE_ID", unverified_role_id: "UNVERIFIED_ROLE_ID",
+      category_id: "CATEGORY_ID", log_channel_id: "LOG_CHANNEL_ID", audit_channel_id: "AUDIT_CHANNEL_ID",
+      suggestion_channel_id: "SUGGESTION_CHANNEL_ID",
+      ticket_text: "Hermes Net support. State your issue or question below.",
+      notification_roles: [
+        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
+        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+      ]
+    },
+    "1528800629701480468": {
+      name: "Hecate Cards", color: "#8E44AD", staff_role_id: "STAFF_ROLE_ID",
+      member_role_id: "MEMBER_ROLE_ID", unverified_role_id: "UNVERIFIED_ROLE_ID",
+      category_id: "CATEGORY_ID", log_channel_id: "LOG_CHANNEL_ID", audit_channel_id: "AUDIT_CHANNEL_ID",
+      suggestion_channel_id: "SUGGESTION_CHANNEL_ID",
+      ticket_text: "Hecate Cards support. Let us know what you need help with.",
+      notification_roles: [
+        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
+        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+      ]
+    },
+    "1528804420383674559": {
+      name: "Plutus Bank", color: "#1E4620", staff_role_id: "STAFF_ROLE_ID",
+      member_role_id: "MEMBER_ROLE_ID", unverified_role_id: "UNVERIFIED_ROLE_ID",
+      category_id: "CATEGORY_ID", log_channel_id: "LOG_CHANNEL_ID", audit_channel_id: "AUDIT_CHANNEL_ID",
+      suggestion_channel_id: "SUGGESTION_CHANNEL_ID",
+      ticket_text: "Plutus Bank support. State your question or report below.",
+      notification_roles: [
+        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
+        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+      ]
+    },
+    "1528807603197706332": {
+      name: "Nemesis Security", color: "#8B0000", staff_role_id: "STAFF_ROLE_ID",
+      member_role_id: "MEMBER_ROLE_ID", unverified_role_id: "UNVERIFIED_ROLE_ID",
+      category_id: "CATEGORY_ID", log_channel_id: "LOG_CHANNEL_ID", audit_channel_id: "AUDIT_CHANNEL_ID",
+      suggestion_channel_id: "SUGGESTION_CHANNEL_ID",
+      ticket_text: "Nemesis Security support. Open a report or ask a question below.",
+      notification_roles: [
+        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
+        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+      ]
+    },
+    "1528809601674514502": {
+      name: "Demeter Realty", color: "#78281F", staff_role_id: "STAFF_ROLE_ID",
+      member_role_id: "MEMBER_ROLE_ID", unverified_role_id: "UNVERIFIED_ROLE_ID",
+      category_id: "CATEGORY_ID", log_channel_id: "LOG_CHANNEL_ID", audit_channel_id: "AUDIT_CHANNEL_ID",
+      suggestion_channel_id: "SUGGESTION_CHANNEL_ID",
+      ticket_text: "Demeter Realty support. Let us know how we can assist you.",
+      notification_roles: [
+        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
+        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+      ]
+    }
+  },
+
+  automod: {
+    blockedWords: ["badword1", "badword2", "spamlink"],
+    capsThreshold: 0.7, maxMentions: 5, maxSpoilers: 3, maxEmojis: 5,
+    inviteFilter: true, linkFilter: false, linkWhitelist: [], linkBlacklist: [],
+    raidJoinThreshold: 10, raidWindowMs: 60000
+  },
+
+  antispam: { maxMessages: 5, windowMs: 3000, timeoutDurationMs: 600000 },
+
+  tickets: { autoCloseHours: 24, maxPerUser: 3 },
+
+  suggestions: { voteThreshold: 10 },
+
+  serverBlacklist: [],
+
+  owners: []
+};
