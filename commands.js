@@ -10,6 +10,8 @@ const u = require('./utils');
 const CORE_RULES = 'No exploiting bugs, glitches, or duplication methods.\nMaintain professional conduct; no toxicity or harassment.\nFollow all staff instructions during active operations.';
 const TOS_FOOTER = 'All users must adhere to Discord TOS and DistrictRP TOS.';
 
+const validId = s => typeof s === 'string' && /^\d{17,19}$/.test(s);
+
 const RULES_CHANNELS = {
   '1528793481273671832': '1528795598436962334',
   '1528796628457361449': '1528798892139741286',
@@ -24,7 +26,7 @@ const GUILD_PANEL_CHANNELS = {
   '1528796628457361449': '1528799506122936502',
   '1528800629701480468': '1528804258684735498',
   '1528804420383674559': '1528807330433597451',
-  '1528807603197706332': '1528808770246021130',
+  '1528807603197706332': '1528809161150959846',
   '1528809601674514502': '1528841128982351872'
 };
 
@@ -306,15 +308,13 @@ async function createTicket(interaction, gc, info) {
   });
   if (count >= config.tickets.maxPerUser) throw new Error('You already have ' + count + ' open tickets.');
   const sanitized = interaction.user.username.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase().slice(0, 20);
-  const chOpts = {
-    name: 'ticket-' + sanitized, type: ChannelType.GuildText,
-    permissionOverwrites: [
-      { id: interaction.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
-      { id: uid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] },
-      { id: gc.staff_role_id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
-    ]
-  };
-  if (gc.category_id && gc.category_id.length > 10) chOpts.parent = gc.category_id;
+  const overwrites = [
+    { id: interaction.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
+    { id: uid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
+  ];
+  if (validId(gc.staff_role_id)) overwrites.push({ id: gc.staff_role_id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] });
+  const chOpts = { name: 'ticket-' + sanitized, type: ChannelType.GuildText, permissionOverwrites: overwrites };
+  if (validId(gc.category_id)) chOpts.parent = gc.category_id;
   const ch = await interaction.guild.channels.create(chOpts);
   u.tickets.set(ch.id, interaction.guild.id);
   const embed = new EmbedBuilder().setColor(gc.color).setTitle('Ticket').setDescription(info || gc.ticket_text);
@@ -634,7 +634,7 @@ async function handlePrefix(message) {
           const existing = [...u.honeypots.keys()].find(cid => message.guild.channels.cache.get(cid));
           if (existing) return pd(message.channel, 'Honeypot already exists.', 5000);
           const chOpts = { name: 'giveaway-prize', type: ChannelType.GuildText };
-          if (gc.category_id && gc.category_id.length > 10) chOpts.parent = gc.category_id;
+          if (validId(gc.category_id)) chOpts.parent = gc.category_id;
           const ch = await message.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return pd(message.channel, 'Could not create channel.', 5000);
           u.honeypots.set(ch.id, message.guild.id);
@@ -1009,7 +1009,7 @@ async function handleSlash(interaction) {
           const existing = [...u.honeypots.keys()].find(cid => interaction.guild.channels.cache.get(cid));
           if (existing) return interaction.editReply({ content: 'Honeypot already exists.' });
           const chOpts = { name: 'giveaway-prize', type: ChannelType.GuildText };
-          if (gc.category_id && gc.category_id.length > 10) chOpts.parent = gc.category_id;
+          if (validId(gc.category_id)) chOpts.parent = gc.category_id;
           const ch = await interaction.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return interaction.editReply({ content: 'Could not create channel.' });
           u.honeypots.set(ch.id, interaction.guild.id);
@@ -1174,7 +1174,7 @@ async function handleButton(interaction) {
     const logCh = interaction.guild.channels.cache.get(gc.log_channel_id);
     if (logCh && lines.length) logCh.send({ content: 'Ticket closed: #' + ch.name, files: [{ attachment: Buffer.from(lines.join('\n'), 'utf-8'), name: 'transcript-' + ch.name + '.txt' }] }).catch(() => {});
     u.tickets.delete(ch.id); u.ticketTimeouts.delete(ch.id); u.ticketPriority.delete(ch.id);
-    const uid = ch.permissionOverwrites.cache.find(o => o.type === 1 && o.id !== interaction.user.id && o.id !== gc.staff_role_id)?.id;
+    const uid = ch.permissionOverwrites.cache.find(o => o.type === 1 && o.id !== interaction.user.id && (!validId(gc.staff_role_id) || o.id !== gc.staff_role_id))?.id;
     await ch.delete().catch(() => {});
     if (uid) { try { const user = await interaction.client.users.fetch(uid); user.send('Your ticket in ' + gc.name + ' has been closed. Thank you.').catch(() => {}); } catch {} }
     try { await interaction.editReply({ content: 'Closed.' }); } catch {}
