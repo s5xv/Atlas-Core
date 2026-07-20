@@ -454,7 +454,9 @@ async function handlePrefix(message) {
         if (sub === 'setup') {
           const existing = [...u.honeypots.keys()].find(cid => message.guild.channels.cache.get(cid));
           if (existing) return pd(message.channel, 'Honeypot already exists.', 5000);
-          const ch = await message.guild.channels.create({ name: 'giveaway-prize', type: ChannelType.GuildText, parent: gc.category_id }).catch(() => null);
+          const chOpts = { name: 'giveaway-prize', type: ChannelType.GuildText };
+          if (gc.category_id && gc.category_id.length > 10) chOpts.parent = gc.category_id;
+          const ch = await message.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return pd(message.channel, 'Could not create channel.', 5000);
           u.honeypots.set(ch.id, message.guild.id);
           await ch.send('Welcome! Type anything to claim your prize.').catch(() => {});
@@ -725,7 +727,9 @@ async function handleSlash(interaction) {
         if (sub === 'setup') {
           const existing = [...u.honeypots.keys()].find(cid => interaction.guild.channels.cache.get(cid));
           if (existing) return interaction.editReply({ content: 'Honeypot already exists.' });
-          const ch = await interaction.guild.channels.create({ name: 'giveaway-prize', type: ChannelType.GuildText, parent: gc.category_id }).catch(() => null);
+          const chOpts = { name: 'giveaway-prize', type: ChannelType.GuildText };
+          if (gc.category_id && gc.category_id.length > 10) chOpts.parent = gc.category_id;
+          const ch = await interaction.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return interaction.editReply({ content: 'Could not create channel.' });
           u.honeypots.set(ch.id, interaction.guild.id);
           await ch.send('Welcome! Type anything to claim your prize.').catch(() => {});
