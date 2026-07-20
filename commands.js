@@ -822,7 +822,7 @@ async function handleButton(interaction) {
     if (interaction.member.roles.cache.has(role.id)) { await interaction.member.roles.remove(role).catch(() => {}); return u.respond(interaction, 'Removed ' + rd.label + '.'); }
     await interaction.member.roles.add(role).catch(() => {}); return u.respond(interaction, 'Added ' + rd.label + '.');
   }
-  if (id === 'suggest_up' || id === 'Suggest_down') {
+  if (id === 'suggest_up' || id === 'suggest_down') {
     await interaction.deferReply({ ephemeral: true });
     const msg = interaction.message; const data = u.suggestions.get(msg.id);
     if (!data) return interaction.editReply({ content: 'Suggestion data not found.' });
