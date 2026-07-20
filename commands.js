@@ -321,8 +321,7 @@ async function createTicket(interaction, gc, info) {
   const embed = new EmbedBuilder().setColor(gc.color).setTitle('Ticket - ' + (interaction.user.username)).setDescription(info || gc.ticket_text);
   const close = new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setStyle(ButtonStyle.Danger);
   const claim = new ButtonBuilder().setCustomId('claim_ticket').setLabel('Claim').setStyle(ButtonStyle.Primary);
-  const rolePing = validId(gc.staff_role_id) ? ' <@&' + gc.staff_role_id + '>' : (u.findStaffRoles(interaction.guild)[0] ? ' <@&' + u.findStaffRoles(interaction.guild)[0] + '>' : '');
-  await ch.send({ content: '<@' + uid + '>' + rolePing, embeds: [embed], components: [new ActionRowBuilder().addComponents(claim, close)] });
+  await ch.send({ content: '<@' + uid + '> @everyone', embeds: [embed], components: [new ActionRowBuilder().addComponents(claim, close)] });
   resetTicketAutoClose(ch.id, gc);
   return ch;
 }
