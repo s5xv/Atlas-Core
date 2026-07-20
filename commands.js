@@ -191,7 +191,7 @@ async function handlePrefix(message) {
   if (!message.content.startsWith('!')) return;
   const args = message.content.slice(1).trim().split(/ +/);
   const cmd = args.shift().toLowerCase();
-  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
+  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
   if (STAFF.includes(cmd) && !u.hasStaffPermission(message.member, gc)) return message.reply('No permission.').then(r => setTimeout(() => r.delete().catch(() => {}), 4000)).catch(() => {});
   u.trackCommand(cmd);
   try {
@@ -477,6 +477,73 @@ async function handlePrefix(message) {
         } else pd(message.channel, 'Subcommands: setup, remove.', 5000);
         break;
       }
+      case 'panel': {
+        const pSub = args.shift();
+        if (pSub === 'create') {
+          const pn = args[0]; const pt = args[1]; const pd2 = args.slice(2).join(' ');
+          if (!pn || !pt) return pd(message.channel, 'Usage: !panel create <name> <title> <description>', 5000);
+          if (u.customPanels.has(pn)) return pd(message.channel, 'Panel already exists.', 5000);
+          u.customPanels.set(pn, { guildId: message.guild.id, title: pt, description: pd2 || '', color: gc.color, buttons: [] });
+          pd(message.channel, 'Panel "' + pn + '" created. Add buttons with !panel button.', 5000);
+        } else if (pSub === 'button') {
+          const pn = args[0]; const bl = args[1]; const bf = args[2]; const bs = args[3] || 'Primary';
+          if (!pn || !bl || !bf) return pd(message.channel, 'Usage: !panel button <panel> <label> <form> [style]', 5000);
+          const p = u.customPanels.get(pn);
+          if (!p) return pd(message.channel, 'Panel not found.', 5000);
+          if (p.guildId !== message.guild.id) return pd(message.channel, 'Panel belongs to another server.', 5000);
+          if (!u.customForms.has(bf)) return pd(message.channel, 'Form "' + bf + '" not found. Create it first with !form create.', 5000);
+          const styles = { Primary: ButtonStyle.Primary, Success: ButtonStyle.Success, Danger: ButtonStyle.Danger, Secondary: ButtonStyle.Secondary };
+          p.buttons.push({ label: bl, formName: bf, style: styles[bs] || ButtonStyle.Primary });
+          u.customPanels.set(pn, p);
+          pd(message.channel, 'Button added to "' + pn + '".', 5000);
+        } else if (pSub === 'deploy') {
+          const pn = args[0]; if (!pn) return pd(message.channel, 'Specify panel name.', 5000);
+          const p = u.customPanels.get(pn);
+          if (!p) return pd(message.channel, 'Panel not found.', 5000);
+          if (p.guildId !== message.guild.id) return pd(message.channel, 'Panel belongs to another server.', 5000);
+          const embed = new EmbedBuilder().setTitle(p.title).setDescription(p.description).setColor(p.color);
+          const rows = []; let batch = [];
+          for (let i = 0; i < p.buttons.length; i++) {
+            batch.push(new ButtonBuilder().setCustomId('cpb_' + pn + '_' + i).setLabel(p.buttons[i].label).setStyle(p.buttons[i].style));
+            if (batch.length === 5 || i === p.buttons.length - 1) { rows.push(new ActionRowBuilder().addComponents(batch)); batch = []; }
+          }
+          await message.channel.send({ embeds: [embed], components: rows });
+          pd(message.channel, 'Panel deployed.', 5000);
+        } else if (pSub === 'list') {
+          const list = [...u.customPanels.values()].filter(p => p.guildId === message.guild.id).map(p => p.title + ' (' + p.buttons.length + ' buttons)').join('\n');
+          pd(message.channel, list ? '**Panels**\n' + list : 'No panels.', 10000);
+        } else pd(message.channel, 'Subcommands: create, button, deploy, list.', 5000);
+        break;
+      }
+      case 'form': {
+        const fSub = args.shift();
+        if (fSub === 'create') {
+          const fn = args[0]; if (!fn) return pd(message.channel, 'Usage: !form create <name>', 5000);
+          if (u.customForms.has(fn)) return pd(message.channel, 'Form already exists.', 5000);
+          u.customForms.set(fn, { guildId: message.guild.id, fields: [] });
+          pd(message.channel, 'Form "' + fn + '" created. Add fields with !form field.', 5000);
+        } else if (fSub === 'field') {
+          const fn = args[0]; const fl = args[1]; const ft = args[2]; const fr = args[3];
+          if (!fn || !fl || !ft) return pd(message.channel, 'Usage: !form field <form> <label> <Short|Paragraph> <true|false>', 5000);
+          const f = u.customForms.get(fn);
+          if (!f) return pd(message.channel, 'Form not found.', 5000);
+          if (f.guildId !== message.guild.id) return pd(message.channel, 'Form belongs to another server.', 5000);
+          f.fields.push({ label: fl, type: ft === 'Paragraph' ? TextInputStyle.Paragraph : TextInputStyle.Short, required: fr === 'true', customId: 'field_' + f.fields.length });
+          u.customForms.set(fn, f);
+          pd(message.channel, 'Field "' + fl + '" added to "' + fn + '".', 5000);
+        } else if (fSub === 'list') {
+          const list = [...u.customForms.entries()].filter(([k, v]) => v.guildId === message.guild.id).map(([k, v]) => k + ' (' + v.fields.length + ' fields)').join('\n');
+          pd(message.channel, list ? '**Forms**\n' + list : 'No forms.', 10000);
+        } else if (fSub === 'delete') {
+          const fn = args[0]; if (!fn) return pd(message.channel, 'Specify form name.', 5000);
+          const f = u.customForms.get(fn);
+          if (!f) return pd(message.channel, 'Form not found.', 5000);
+          if (f.guildId !== message.guild.id) return pd(message.channel, 'Form belongs to another server.', 5000);
+          u.customForms.delete(fn);
+          pd(message.channel, 'Form "' + fn + '" deleted.', 5000);
+        } else pd(message.channel, 'Subcommands: create, field, list, delete.', 5000);
+        break;
+      }
       case 'reload': {
         delete require.cache[require.resolve('./config')];
         Object.assign(config, require('./config'));
@@ -512,7 +579,7 @@ async function handleSlash(interaction) {
   const gc = u.getGuildConfig(interaction.guildId);
   if (!gc) return u.respond(interaction, 'Not configured.');
   const cmd = interaction.commandName;
-  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
+  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
   if (STAFF.includes(cmd) && !u.hasStaffPermission(interaction.member, gc)) return u.respond(interaction, 'No permission.');
   u.trackCommand(cmd);
   try {
@@ -758,6 +825,74 @@ async function handleSlash(interaction) {
         }
         break;
       }
+      case 'panel': {
+        await interaction.deferReply(ereply);
+        const sub = interaction.options.getSubcommand();
+        if (sub === 'create') {
+          const n = interaction.options.getString('name'); const t = interaction.options.getString('title'); const d = interaction.options.getString('description');
+          if (u.customPanels.has(n)) return interaction.editReply({ content: 'Panel "' + n + '" already exists.' });
+          u.customPanels.set(n, { guildId: interaction.guild.id, title: t, description: d, color: gc.color, buttons: [] });
+          await interaction.editReply({ content: 'Panel "' + n + '" created.' });
+        } else if (sub === 'button') {
+          const pn = interaction.options.getString('panel'); const bl = interaction.options.getString('label');
+          const bf = interaction.options.getString('form'); const bs = interaction.options.getString('style');
+          const p = u.customPanels.get(pn);
+          if (!p) return interaction.editReply({ content: 'Panel not found.' });
+          if (p.guildId !== interaction.guild.id) return interaction.editReply({ content: 'Panel belongs to another server.' });
+          if (!u.customForms.has(bf)) return interaction.editReply({ content: 'Form "' + bf + '" not found.' });
+          const styles = { Primary: ButtonStyle.Primary, Success: ButtonStyle.Success, Danger: ButtonStyle.Danger, Secondary: ButtonStyle.Secondary };
+          p.buttons.push({ label: bl, formName: bf, style: styles[bs] || ButtonStyle.Primary });
+          u.customPanels.set(pn, p);
+          await interaction.editReply({ content: 'Button added to "' + pn + '".' });
+        } else if (sub === 'deploy') {
+          const pn = interaction.options.getString('name');
+          const p = u.customPanels.get(pn);
+          if (!p) return interaction.editReply({ content: 'Panel not found.' });
+          if (p.guildId !== interaction.guild.id) return interaction.editReply({ content: 'Panel belongs to another server.' });
+          const embed = new EmbedBuilder().setTitle(p.title).setDescription(p.description).setColor(p.color);
+          const rows = []; let batch = [];
+          for (let i = 0; i < p.buttons.length; i++) {
+            batch.push(new ButtonBuilder().setCustomId('cpb_' + pn + '_' + i).setLabel(p.buttons[i].label).setStyle(p.buttons[i].style));
+            if (batch.length === 5 || i === p.buttons.length - 1) { rows.push(new ActionRowBuilder().addComponents(batch)); batch = []; }
+          }
+          await interaction.channel.send({ embeds: [embed], components: rows });
+          await interaction.editReply({ content: 'Panel deployed.' });
+        } else if (sub === 'list') {
+          const list = [...u.customPanels.values()].filter(p => p.guildId === interaction.guild.id).map(p => p.title + ' (' + p.buttons.length + ' buttons)').join('\n');
+          await interaction.editReply({ content: list ? '**Panels**\n' + list : 'No panels.' });
+        }
+        break;
+      }
+      case 'form': {
+        await interaction.deferReply(ereply);
+        const sub = interaction.options.getSubcommand();
+        if (sub === 'create') {
+          const n = interaction.options.getString('name');
+          if (u.customForms.has(n)) return interaction.editReply({ content: 'Form "' + n + '" already exists.' });
+          u.customForms.set(n, { guildId: interaction.guild.id, fields: [] });
+          await interaction.editReply({ content: 'Form "' + n + '" created.' });
+        } else if (sub === 'field') {
+          const fn = interaction.options.getString('form'); const fl = interaction.options.getString('label');
+          const ft = interaction.options.getString('type'); const fr = interaction.options.getBoolean('required');
+          const f = u.customForms.get(fn);
+          if (!f) return interaction.editReply({ content: 'Form not found.' });
+          if (f.guildId !== interaction.guild.id) return interaction.editReply({ content: 'Form belongs to another server.' });
+          f.fields.push({ label: fl, type: ft === 'Paragraph' ? TextInputStyle.Paragraph : TextInputStyle.Short, required: fr, customId: 'field_' + f.fields.length });
+          u.customForms.set(fn, f);
+          await interaction.editReply({ content: 'Field "' + fl + '" added to "' + fn + '".' });
+        } else if (sub === 'list') {
+          const list = [...u.customForms.entries()].filter(([k, v]) => v.guildId === interaction.guild.id).map(([k, v]) => k + ' (' + v.fields.length + ' fields)').join('\n');
+          await interaction.editReply({ content: list ? '**Forms**\n' + list : 'No forms.' });
+        } else if (sub === 'delete') {
+          const n = interaction.options.getString('name');
+          const f = u.customForms.get(n);
+          if (!f) return interaction.editReply({ content: 'Form not found.' });
+          if (f.guildId !== interaction.guild.id) return interaction.editReply({ content: 'Form belongs to another server.' });
+          u.customForms.delete(n);
+          await interaction.editReply({ content: 'Form "' + n + '" deleted.' });
+        }
+        break;
+      }
       case 'reload': await interaction.deferReply(ereply); delete require.cache[require.resolve('./config')]; Object.assign(config, require('./config')); await interaction.editReply({ content: 'Reloaded.' }); break;
       case 'presence': {
         const type = parseInt(interaction.options.getString('type')); const name = interaction.options.getString('name');
@@ -819,6 +954,20 @@ async function handleButton(interaction) {
     if (interaction.member.roles.cache.has(role.id)) { await interaction.member.roles.remove(role).catch(() => {}); return u.respond(interaction, 'Removed ' + rd.label + '.'); }
     await interaction.member.roles.add(role).catch(() => {}); return u.respond(interaction, 'Added ' + rd.label + '.');
   }
+  if (id.startsWith('cpb_')) {
+    const parts = id.split('_'); parts.shift(); const pn = parts.shift(); const bi = parseInt(parts.shift());
+    const p = u.customPanels.get(pn);
+    if (!p || p.guildId !== interaction.guild.id) return u.respond(interaction, 'Panel not found.');
+    const btn = p.buttons[bi];
+    if (!btn) return u.respond(interaction, 'Button not found.');
+    const f = u.customForms.get(btn.formName);
+    if (!f || f.guildId !== interaction.guild.id) return u.respond(interaction, 'Form not found.');
+    const modal = new ModalBuilder().setCustomId('cfm_' + pn + '_' + bi).setTitle(btn.label);
+    f.fields.forEach(fld => {
+      modal.addComponents(new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(fld.customId).setLabel(fld.label).setStyle(fld.type).setRequired(fld.required)));
+    });
+    return interaction.showModal(modal);
+  }
 }
 
 async function handleSelectMenu(interaction) {
@@ -864,6 +1013,22 @@ async function handleModal(interaction) {
     const info = '**Application**\nPosition: ' + pos + '\nExperience: ' + exp + '\nWhy: ' + why;
     const ch = await createTicket(interaction, gc, info).catch(e => { interaction.editReply({ content: e.message }); return null; });
     if (ch) await interaction.editReply({ content: 'Ticket created: ' + ch.toString() }); return;
+  }
+  if (interaction.customId.startsWith('cfm_')) {
+    const parts = interaction.customId.split('_'); parts.shift(); const pn = parts.shift(); const bi = parseInt(parts.shift());
+    const p = u.customPanels.get(pn);
+    if (!p || p.guildId !== interaction.guild.id) return interaction.editReply({ content: 'Panel not found.' });
+    const btn = p.buttons[bi];
+    if (!btn) return interaction.editReply({ content: 'Button not found.' });
+    const f = u.customForms.get(btn.formName);
+    if (!f || f.guildId !== interaction.guild.id) return interaction.editReply({ content: 'Form not found.' });
+    let response = '**' + btn.label + '**\nUser: ' + interaction.user.tag + '\n';
+    f.fields.forEach(fld => {
+      response += '**' + fld.label + ':** ' + interaction.fields.getTextInputValue(fld.customId) + '\n';
+    });
+    const logCh = interaction.guild.channels.cache.get(gc.log_channel_id);
+    if (logCh) logCh.send({ content: response }).catch(() => {});
+    await interaction.editReply({ content: 'Form submitted.' });
   }
 }
 
