@@ -166,6 +166,11 @@ const commands = [
     .addSubcommand(s => s.setName('delete').setDescription('Delete a form')
       .addStringOption(o => o.setName('name').setDescription('Form name').setRequired(true))),
 
+  new SlashCommandBuilder().setName('embed').setDescription('Send a custom embed')
+    .addStringOption(o => o.setName('title').setDescription('Embed title').setRequired(true))
+    .addStringOption(o => o.setName('description').setDescription('Embed description').setRequired(true))
+    .addStringOption(o => o.setName('color').setDescription('Hex color (e.g. #FF0000)').setRequired(false)),
+
   new SlashCommandBuilder().setName('reload').setDescription('Reload bot configuration'),
   new SlashCommandBuilder().setName('presence').setDescription('Set bot presence')
     .addStringOption(o => o.setName('type').setDescription('Activity type')

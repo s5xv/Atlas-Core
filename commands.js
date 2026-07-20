@@ -191,7 +191,7 @@ async function handlePrefix(message) {
   if (!message.content.startsWith('!')) return;
   const args = message.content.slice(1).trim().split(/ +/);
   const cmd = args.shift().toLowerCase();
-  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
+  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'embed', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
   if (STAFF.includes(cmd) && !u.hasStaffPermission(message.member, gc)) return message.reply('No permission.').then(r => setTimeout(() => r.delete().catch(() => {}), 4000)).catch(() => {});
   u.trackCommand(cmd);
   try {
@@ -477,6 +477,13 @@ async function handlePrefix(message) {
         } else pd(message.channel, 'Subcommands: setup, remove.', 5000);
         break;
       }
+      case 'embed': {
+        const title = args[0]; const desc = args.slice(1).join(' ');
+        if (!title || !desc) return pd(message.channel, 'Usage: !embed <title> <description>', 5000);
+        const e = new EmbedBuilder().setTitle(title).setDescription(desc).setColor(gc.color);
+        await message.channel.send({ embeds: [e] });
+        break;
+      }
       case 'panel': {
         const pSub = args.shift();
         if (pSub === 'create') {
@@ -579,7 +586,7 @@ async function handleSlash(interaction) {
   const gc = u.getGuildConfig(interaction.guildId);
   if (!gc) return u.respond(interaction, 'Not configured.');
   const cmd = interaction.commandName;
-  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
+  const STAFF = ['verify', 'ticket', 'roles', 'purge', 'msg', 'warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'tempban', 'slowmode', 'lock', 'unlock', 'hide', 'unhide', 'nick', 'voicekick', 'voicemove', 'note', 'shadowban', 'unshadowban', 'honeypot', 'embed', 'panel', 'form', 'reload', 'presence', 'shutdown', 'eval', 'sync'];
   if (STAFF.includes(cmd) && !u.hasStaffPermission(interaction.member, gc)) return u.respond(interaction, 'No permission.');
   u.trackCommand(cmd);
   try {
@@ -823,6 +830,17 @@ async function handleSlash(interaction) {
           u.honeypots.delete(cid); const ch = interaction.guild.channels.cache.get(cid); if (ch) await ch.delete().catch(() => {});
           await interaction.editReply({ content: 'Honeypot removed.' });
         }
+        break;
+      }
+      case 'embed': {
+        await interaction.deferReply(ereply);
+        const title = interaction.options.getString('title');
+        const desc = interaction.options.getString('description');
+        const color = interaction.options.getString('color') || null;
+        const parsedColor = color ? parseInt(color.replace('#', ''), 16) : gc.color;
+        const e = new EmbedBuilder().setTitle(title).setDescription(desc).setColor(parsedColor);
+        await interaction.channel.send({ embeds: [e] });
+        await interaction.editReply({ content: 'Embed sent.' });
         break;
       }
       case 'panel': {
