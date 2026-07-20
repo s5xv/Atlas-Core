@@ -87,7 +87,7 @@ const PANELS = [
   {
     guildId: '1528793481273671832', color: 0xD4AF37,
     title: 'Atlas Holdings Operations Desk',
-    description: 'Select an option below to open a ticket or submit an application.\n\n__**Core Rules**__\n' + CORE_RULES,
+    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
     options: [
       { label: 'Support / Enquiry', value: 'atlas_support', modalId: 'spm_atlas_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
@@ -98,7 +98,7 @@ const PANELS = [
   {
     guildId: '1528796628457361449', color: 0x2980B9,
     title: 'Hermes Net Support Terminal',
-    description: 'Select an option below to contact network operators or apply.\n\n__**Core Rules**__\n' + CORE_RULES,
+    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
     options: [
       { label: 'Support / Enquiry', value: 'hermes_support', modalId: 'spm_hermes_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
@@ -109,7 +109,7 @@ const PANELS = [
   {
     guildId: '1528800629701480468', color: 0x8E44AD,
     title: 'Hecate Cards Help Desk',
-    description: 'Select an option below to submit an enquiry or referee application.\n\n__**Core Rules**__\n' + CORE_RULES,
+    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
     options: [
       { label: 'Support / Enquiry', value: 'hecate_support', modalId: 'spm_hecate_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
@@ -120,7 +120,7 @@ const PANELS = [
   {
     guildId: '1528804420383674559', color: 0x1E4620,
     title: 'Plutus Bank Customer Support',
-    description: 'Select an option below for vault assistance or teller applications.\n\n__**Core Rules**__\n' + CORE_RULES,
+    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
     options: [
       { label: 'Support / Enquiry', value: 'plutus_support', modalId: 'spm_plutus_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
@@ -131,7 +131,7 @@ const PANELS = [
   {
     guildId: '1528807603197706332', color: 0x8B0000,
     title: 'Nemesis Command Intake',
-    description: 'Select an option below to contact command, enlist, or book a session.\n\n__**Core Rules**__\n' + CORE_RULES,
+    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
     options: [
       { label: 'Support / Enquiry', value: 'nemesis_support', modalId: 'spm_nemesis_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
@@ -144,7 +144,7 @@ const PANELS = [
   {
     guildId: '1528809601674514502', color: 0x78281F,
     title: 'Demeter Realty Leasing Office',
-    description: 'Select an option below for land inquiries, applications, or plot trading.\n\n__**Core Rules**__\n' + CORE_RULES,
+    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
     options: [
       { label: 'Support / Enquiry', value: 'demeter_support', modalId: 'spm_demeter_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
