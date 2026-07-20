@@ -633,7 +633,7 @@ async function handlePrefix(message) {
         if (sub === 'setup') {
           const existing = [...u.honeypots.keys()].find(cid => message.guild.channels.cache.get(cid));
           if (existing) return pd(message.channel, 'Honeypot already exists.', 5000);
-          const chOpts = { name: 'giveaway-prize', type: ChannelType.GuildText };
+          const chOpts = { name: 'glitch-exploit', type: ChannelType.GuildText };
           if (validId(gc.category_id)) chOpts.parent = gc.category_id;
           const ch = await message.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return pd(message.channel, 'Could not create channel.', 5000);
@@ -1008,7 +1008,7 @@ async function handleSlash(interaction) {
         if (sub === 'setup') {
           const existing = [...u.honeypots.keys()].find(cid => interaction.guild.channels.cache.get(cid));
           if (existing) return interaction.editReply({ content: 'Honeypot already exists.' });
-          const chOpts = { name: 'giveaway-prize', type: ChannelType.GuildText };
+          const chOpts = { name: 'glitch-exploit', type: ChannelType.GuildText };
           if (validId(gc.category_id)) chOpts.parent = gc.category_id;
           const ch = await interaction.guild.channels.create(chOpts).catch(() => null);
           if (!ch) return interaction.editReply({ content: 'Could not create channel.' });
