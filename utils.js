@@ -16,6 +16,8 @@ const pastes = new Collection();
 const notes = new Collection();
 const shadowbans = new Set();
 const honeypots = new Collection();
+const customPanels = new Collection();
+const customForms = new Collection();
 
 let pasteCounter = 0;
 
@@ -148,7 +150,7 @@ const timezones = {
 module.exports = {
   antispam, tickets, ticketTimeouts, ticketPriority, warnings, warnCounters,
   commandStats, joinTimestamps, raidMode, countdowns, claimedTickets,
-  pastes, notes, shadowbans, honeypots, pasteCounter,
+  pastes, notes, shadowbans,   honeypots, customPanels, customForms, pasteCounter,
   getGuildConfig, hasStaffPermission, respond, parseDuration, formatDuration,
   trackCommand, logAudit, eightball, jokes, trivia, asciiArts, priorities, timezones
 };

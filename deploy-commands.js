@@ -136,6 +136,36 @@ const commands = [
     .addSubcommand(s => s.setName('setup').setDescription('Create a honeypot channel'))
     .addSubcommand(s => s.setName('remove').setDescription('Remove the honeypot channel')),
 
+  new SlashCommandBuilder().setName('panel').setDescription('Custom panel system')
+    .addSubcommand(s => s.setName('create').setDescription('Create a new panel')
+      .addStringOption(o => o.setName('name').setDescription('Panel name').setRequired(true))
+      .addStringOption(o => o.setName('title').setDescription('Embed title').setRequired(true))
+      .addStringOption(o => o.setName('description').setDescription('Embed description').setRequired(true)))
+    .addSubcommand(s => s.setName('button').setDescription('Add a button to a panel')
+      .addStringOption(o => o.setName('panel').setDescription('Panel name').setRequired(true))
+      .addStringOption(o => o.setName('label').setDescription('Button label').setRequired(true))
+      .addStringOption(o => o.setName('form').setDescription('Form to open on click').setRequired(true))
+      .addStringOption(o => o.setName('style').setDescription('Button style')
+        .addChoices({ name: 'Primary', value: 'Primary' }, { name: 'Success', value: 'Success' }, { name: 'Danger', value: 'Danger' }, { name: 'Secondary', value: 'Secondary' })
+        .setRequired(true)))
+    .addSubcommand(s => s.setName('deploy').setDescription('Deploy a panel to this channel')
+      .addStringOption(o => o.setName('name').setDescription('Panel name').setRequired(true)))
+    .addSubcommand(s => s.setName('list').setDescription('List all panels')),
+
+  new SlashCommandBuilder().setName('form').setDescription('Custom form system')
+    .addSubcommand(s => s.setName('create').setDescription('Create a new form')
+      .addStringOption(o => o.setName('name').setDescription('Form name').setRequired(true)))
+    .addSubcommand(s => s.setName('field').setDescription('Add a field to a form')
+      .addStringOption(o => o.setName('form').setDescription('Form name').setRequired(true))
+      .addStringOption(o => o.setName('label').setDescription('Field label').setRequired(true))
+      .addStringOption(o => o.setName('type').setDescription('Field type')
+        .addChoices({ name: 'Short', value: 'Short' }, { name: 'Paragraph', value: 'Paragraph' })
+        .setRequired(true))
+      .addBooleanOption(o => o.setName('required').setDescription('Is this field required?').setRequired(true)))
+    .addSubcommand(s => s.setName('list').setDescription('List all forms'))
+    .addSubcommand(s => s.setName('delete').setDescription('Delete a form')
+      .addStringOption(o => o.setName('name').setDescription('Form name').setRequired(true))),
+
   new SlashCommandBuilder().setName('reload').setDescription('Reload bot configuration'),
   new SlashCommandBuilder().setName('presence').setDescription('Set bot presence')
     .addStringOption(o => o.setName('type').setDescription('Activity type')
