@@ -10,6 +10,15 @@ const u = require('./utils');
 const CORE_RULES = 'No exploiting bugs, glitches, or duplication methods.\nMaintain professional conduct; no toxicity or harassment.\nFollow all staff instructions during active operations.';
 const TOS_FOOTER = 'All users must adhere to Discord TOS and DistrictRP TOS.';
 
+const RULES_CHANNELS = {
+  '1528793481273671832': '1528795598436962334',
+  '1528796628457361449': '1528798892139741286',
+  '1528800629701480468': '1528802578488360970',
+  '1528804420383674559': '1528807062094745812',
+  '1528807603197706332': '1528808770246021130',
+  '1528809601674514502': '1528840197796532294'
+};
+
 const GUILD_PANEL_CHANNELS = {
   '1528793481273671832': '1528796269001183272',
   '1528796628457361449': '1528799506122936502',
@@ -22,6 +31,57 @@ const GUILD_PANEL_CHANNELS = {
 const F = (id, label, style = TextInputStyle.Short, required = true) => ({ id, label, style, required });
 const S = TextInputStyle.Short;
 const P = TextInputStyle.Paragraph;
+
+const RULES_DATA = {
+  '1528793481273671832': { color: 0xD4AF37, title: 'Atlas Holdings — Official Rules & Regulations',
+    sections: [
+      { name: '📜 General Conduct', value: '**1.** All members must treat fellow players with respect at all times. Harassment, discrimination, or hate speech will not be tolerated.\n**2.** Follow the chain of command. Disrespect toward senior staff or management will not be tolerated.\n**3.** Do not impersonate staff members, corporate officers, or government officials.\n**4.** Keep all communications professional within official channels.\n**5.** Meta-gaming, power-gaming, and fail-RP are strictly prohibited.' },
+      { name: '💬 Communication Standards', value: '**1.** No spamming, excessive caps, or disruptive behaviour in any channel.\n**2.** Do not share personal information about others without consent.\n**3.** All disputes should be taken to staff via tickets, not public channels.\n**4.** Voice chat must remain in-character during active roleplay.\n**5.** Do not advertise other servers or services without staff approval.' },
+      { name: '🏢 Business & Operations', value: '**1.** All transactions must be documented and reported to management.\n**2.** Employees must maintain activity. Extended absences require HR notification.\n**3.** Confidential information must not be shared with external parties.\n**4.** Company assets require approved purchasing pipeline for procurement.\n**5.** Failure to meet performance standards may result in demotion or termination.' },
+      { name: '⚔️ Roleplay Standards', value: '**1.** Stay in-character while on company business. Mark OOC with (( )).\n**2.** New developments require board approval before execution.\n**3.** Corporate espionage requires explicit staff authorisation.\n**4.** All contracts must be honoured once signed.\n**5.** Use channels for their intended purpose only.' },
+      { name: '🚫 Prohibited Actions', value: '**1.** Exploiting bugs or glitches for gain is strictly forbidden.\n**2.** Cheating software, macros, or automation tools are banned.\n**3.** Real-money trading of in-game items or currency is forbidden.\n**4.** OOC harassment or threats are grounds for immediate removal.\n**5.** Alt accounts to bypass bans or restrictions are prohibited.' }
+    ] },
+  '1528796628457361449': { color: 0x2980B9, title: 'Hermes Net — Official Rules & Regulations',
+    sections: [
+      { name: '📜 General Conduct', value: '**1.** All users must conduct themselves professionally at all times.\n**2.** Respect network operators and staff. Non-compliance may result in suspension.\n**3.** Impersonating Hermes Net employees or affiliates is prohibited.\n**4.** All communications are subject to monitoring for security.\n**5.** Meta-gaming and power-gaming are prohibited.' },
+      { name: '💬 Communication', value: '**1.** Maintain clear and respectful communication in all channels.\n**2.** Do not share DMs without consent of all parties.\n**3.** Use appropriate channels for your enquiry type.\n**4.** In-character voice is expected during RP scenarios.\n**5.** Advertising competing networks is prohibited.' },
+      { name: '🌐 Network Usage', value: '**1.** Network resources are for legitimate business use only.\n**2.** Unauthorised access to restricted systems will result in termination.\n**3.** Data interception without authorisation is strictly forbidden.\n**4.** Bandwidth-heavy activities degrading performance are not permitted.\n**5.** Network modifications require senior engineer approval.' },
+      { name: '⚔️ RP Standards', value: '**1.** All network-related RP scenarios must be realistic.\n**2.** Service interruptions should follow proper escalation procedures.\n**3.** Customer data privacy must be maintained in-character.\n**4.** Security incidents require immediate reporting.\n**5.** Repairs and maintenance must be logged.' },
+      { name: '🚫 Prohibited', value: '**1.** Exploiting network bugs is strictly forbidden.\n**2.** Macros or automation for network systems are prohibited.\n**3.** RMT of network services or equipment is forbidden.\n**4.** OOC harassment of customers or colleagues is grounds for dismissal.\n**5.** Alt accounts to evade restrictions are prohibited.' }
+    ] },
+  '1528800629701480468': { color: 0x8E44AD, title: 'Hecate Cards — Official Rules & Regulations',
+    sections: [
+      { name: '📜 General Conduct', value: '**1.** All patrons and staff must behave respectfully.\n**2.** Follow staff and security instructions at all times.\n**3.** Impersonating employees or management is prohibited.\n**4.** Manipulating game outcomes is forbidden.\n**5.** Meta-gaming casino operations is prohibited.' },
+      { name: '💬 Communication', value: '**1.** Keep communications respectful and appropriate.\n**2.** Do not share game outcomes disruptively.\n**3.** Disputes must be submitted via formal ticket.\n**4.** Stay in-character in voice channels.\n**5.** No advertising competing establishments.' },
+      { name: '🎰 Gaming Rules', value: '**1.** All bets placed before each round starts.\n**2.** Bet limits are posted at each table.\n**3.** Sufficient funds required before betting.\n**4.** Cheating or advantage play is strictly prohibited.\n**5.** Tampering with equipment is forbidden.' },
+      { name: '💰 Payouts', value: '**1.** Winnings paid at conclusion of each round.\n**2.** Management decision on disputes is final.\n**3.** Chargebacks after payout may result in termination.\n**4.** Loyalty points awarded at management discretion.\n**5.** All transactions are recorded.' },
+      { name: '🚫 Prohibited', value: '**1.** Exploiting gaming system bugs is forbidden.\n**2.** Bots or automated betting are prohibited.\n**3.** RMT of chips or rewards is forbidden.\n**4.** Intimidating patrons or staff is grounds for removal.\n**5.** Alt accounts to bypass limits are prohibited.' }
+    ] },
+  '1528804420383674559': { color: 0x1E4620, title: 'Plutus Bank — Official Rules & Regulations',
+    sections: [
+      { name: '📜 General Conduct', value: '**1.** Customers and staff must conduct themselves professionally.\n**2.** Follow teller, manager, and security instructions.\n**3.** Impersonating bank employees is a serious offence.\n**4.** All banking activities are monitored for security.\n**5.** Meta-gaming financial information is prohibited.' },
+      { name: '💬 Communication', value: '**1.** Communicate with bank staff respectfully.\n**2.** Customer financial information is confidential.\n**3.** Enquiries go through appropriate channels.\n**4.** No sensitive matters in public channels.\n**5.** Advertising competing institutions is prohibited.' },
+      { name: '🏦 Banking Operations', value: '**1.** Deposits and withdrawals through authorised tellers only.\n**2.** Large transactions require manager approval.\n**3.** Account holders responsible for security.\n**4.** Loan applications subject to credit evaluation.\n**5.** Vault access restricted to authorised personnel.' },
+      { name: '💰 Financial Regulations', value: '**1.** All transactions comply with in-character regulations.\n**2.** Interest rates subject to change with notice.\n**3.** Account closures processed in person.\n**4.** Overdrafts require prior arrangements.\n**5.** Fee disputes submitted in writing.' },
+      { name: '🚫 Prohibited', value: '**1.** Exploiting banking glitches for gain is forbidden.\n**2.** Money laundering or financial crime is prohibited.\n**3.** RMT of in-game currency is forbidden.\n**4.** OOC threats to staff or customers are grounds for removal.\n**5.** Alt accounts to evade transaction limits are prohibited.' }
+    ] },
+  '1528807603197706332': { color: 0x8B0000, title: 'Nemesis Security — Official Rules & Regulations',
+    sections: [
+      { name: '📜 General Conduct', value: '**1.** All personnel must adhere to the code of conduct.\n**2.** Chain of command must be respected.\n**3.** Impersonating personnel or allies is prohibited.\n**4.** Operations must follow standard protocols.\n**5.** Meta-gaming operational info is forbidden.' },
+      { name: '💬 Communication', value: '**1.** Use proper radio discipline during operations.\n**2.** Classified info not discussed in public channels.\n**3.** Active operation comms take priority.\n**4.** After-action reports due within 24 hours.\n**5.** No discussing ops with external parties.' },
+      { name: '⚔️ Operations', value: '**1.** Force proportionate to threat level required.\n**2.** Patrols follow designated routes unless rerouted.\n**3.** Issued equipment is operator responsibility.\n**4.** Checkpoints follow standard procedures.\n**5.** Personnel must maintain deployment readiness.' },
+      { name: '🎯 Mission Conduct', value: '**1.** Mission parameters defined before deployment.\n**2.** Civilian casualties must be avoided.\n**3.** Captured individuals processed per procedure.\n**4.** Intelligence reported to command immediately.\n**5.** Rules of engagement set by command.' },
+      { name: '🚫 Prohibited', value: '**1.** Exploiting mechanics for tactical advantage is forbidden.\n**2.** Macros or third-party combat tools are prohibited.\n**3.** RMT of equipment or ranks is forbidden.\n**4.** OOC harassment is grounds for discharge.\n**5.** Alt accounts to bypass clearances are prohibited.' }
+    ] },
+  '1528809601674514502': { color: 0x78281F, title: 'Demeter Realty — Official Rules & Regulations',
+    sections: [
+      { name: '📜 General Conduct', value: '**1.** All clients, agents, and staff must act with integrity.\n**2.** Follow agent and management instructions.\n**3.** Impersonating agents or inspectors is prohibited.\n**4.** All transactions must be fully documented.\n**5.** Meta-gaming property values is prohibited.' },
+      { name: '💬 Communication', value: '**1.** Property communications must be professional.\n**2.** Client confidentiality must be maintained.\n**3.** Use appropriate channels for listings and negotiations.\n**4.** Offers through authorised agents only.\n**5.** Advertising competing realty services is prohibited.' },
+      { name: '🏠 Property Rules', value: '**1.** Listings must include accurate descriptions and pricing.\n**2.** Properties must be inspected before listing.\n**3.** Commissions are standardised.\n**4.** Exclusive listings honoured for duration.\n**5.** All sales through official Demeter channels.' },
+      { name: '📋 Agent Standards', value: '**1.** Agents must maintain active licensure.\n**2.** Conflicts of interest must be disclosed.\n**3.** Agents responsible for listing accuracy.\n**4.** Client funds follow trust accounting.\n**5.** Enquiry responses within 24 hours required.' },
+      { name: '🚫 Prohibited', value: '**1.** Exploiting property system bugs is forbidden.\n**2.** Automation for property interactions is prohibited.\n**3.** RMT of properties or deeds is forbidden.\n**4.** OOC harassment is grounds for termination.\n**5.** Alt accounts to bypass ownership limits are prohibited.' }
+    ] }
+};
 
 const PANELS = [
   {
@@ -208,6 +268,21 @@ async function sendServicePanel(channel, panel) {
   const select = new StringSelectMenuBuilder().setCustomId('sp_' + panel.guildId).setPlaceholder('Choose an option');
   panel.options.forEach(o => select.addOptions(new StringSelectMenuOptionBuilder().setLabel(o.label).setDescription(o.label).setValue(o.value)));
   return channel.send({ embeds: [e], components: [new ActionRowBuilder().addComponents(select)] });
+}
+
+async function sendRulesEmbed(channel, guildId) {
+  const rd = RULES_DATA[guildId];
+  if (!rd) return;
+  const embeds = [];
+  const main = new EmbedBuilder().setTitle(rd.title).setDescription('Please read all rules carefully. Ignorance is not an excuse.').setColor(rd.color).setFooter({ text: TOS_FOOTER });
+  embeds.push(main);
+  let batch = [];
+  for (const s of rd.sections) {
+    batch.push({ name: s.name, value: s.value, inline: false });
+    if (batch.length === 5) { embeds.push(new EmbedBuilder().setColor(rd.color).addFields(batch).setFooter({ text: TOS_FOOTER })); batch = []; }
+  }
+  if (batch.length) embeds.push(new EmbedBuilder().setColor(rd.color).addFields(batch).setFooter({ text: TOS_FOOTER }));
+  for (const e of embeds) await channel.send({ embeds: [e] });
 }
 
 async function sendRolePanel(channel, gc) {
@@ -650,16 +725,21 @@ async function handlePrefix(message) {
         break;
       }
       case 'deploy-panels': {
-        const pc = PANELS.filter(p => p.guildId === message.guild.id);
-        if (!pc.length) return pd(message.channel, 'No panels configured for this server.', 5000);
-        for (const panel of pc) {
+        const gid = message.guild.id;
+        const rchId = RULES_CHANNELS[gid];
+        if (rchId) {
+          const rch = message.guild.channels.cache.get(rchId);
+          if (rch) await sendRulesEmbed(rch, gid);
+        }
+        const pc = PANELS.filter(p => p.guildId === gid);
+        if (pc.length) for (const panel of pc) {
           const chId = GUILD_PANEL_CHANNELS[panel.guildId];
-          if (!chId) { pd(message.channel, 'No channel configured for ' + panel.guildId, 5000); continue; }
+          if (!chId) continue;
           const ch = message.guild.channels.cache.get(chId);
-          if (!ch) { pd(message.channel, 'Channel not found for panel.', 5000); continue; }
+          if (!ch) continue;
           await sendServicePanel(ch, panel);
         }
-        pd(message.channel, 'Panels deployed.', 5000);
+        pd(message.channel, 'Rules & panels deployed.', 5000);
         break;
       }
       case 'reload': {
@@ -1024,16 +1104,21 @@ async function handleSlash(interaction) {
       }
       case 'deploy-panels': {
         await interaction.deferReply(ereply);
-        const pc = PANELS.filter(p => p.guildId === interaction.guild.id);
-        if (!pc.length) return interaction.editReply({ content: 'No panels configured for this server.' });
-        for (const panel of pc) {
+        const gid = interaction.guild.id;
+        const rchId = RULES_CHANNELS[gid];
+        if (rchId) {
+          const rch = interaction.guild.channels.cache.get(rchId);
+          if (rch) await sendRulesEmbed(rch, gid);
+        }
+        const pc = PANELS.filter(p => p.guildId === gid);
+        if (pc.length) for (const panel of pc) {
           const chId = GUILD_PANEL_CHANNELS[panel.guildId];
           if (!chId) continue;
           const ch = interaction.guild.channels.cache.get(chId);
           if (!ch) continue;
           await sendServicePanel(ch, panel);
         }
-        await interaction.editReply({ content: 'Panels deployed.' });
+        await interaction.editReply({ content: 'Rules & panels deployed.' });
         break;
       }
       case 'reload': await interaction.deferReply(ereply); delete require.cache[require.resolve('./config')]; Object.assign(config, require('./config')); await interaction.editReply({ content: 'Reloaded.' }); break;
