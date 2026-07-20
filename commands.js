@@ -200,8 +200,7 @@ async function handlePrefix(message) {
       case 'roles': await message.delete().catch(() => {}); await sendRolePanel(message.channel, gc); break;
       case 'ticket': {
         await message.delete().catch(() => {});
-        const tc = gc.ticket_panel_channel_id && message.guild.channels.cache.get(gc.ticket_panel_channel_id);
-        await sendTicketHub(tc || message.channel, gc);
+        await sendTicketHub(message.channel, gc);
         break;
       }
       case 'purge': {
@@ -525,9 +524,13 @@ async function handleSlash(interaction) {
         const sub = interaction.options.getSubcommand();
         if (sub === 'panel') {
           await interaction.deferReply(ereply);
-          const tc = gc.ticket_panel_channel_id && interaction.guild.channels.cache.get(gc.ticket_panel_channel_id);
-          await sendTicketHub(tc || interaction.channel, gc);
-          return interaction.editReply({ content: 'Ticket hub deployed.' });
+          try {
+            await sendTicketHub(interaction.channel, gc);
+            await interaction.editReply({ content: 'Ticket hub deployed.' });
+          } catch (e) {
+            await interaction.editReply({ content: 'Failed to deploy panel. Check bot permissions.' });
+          }
+          return;
         }
         await interaction.deferReply(ereply);
         if (sub === 'claim') {
