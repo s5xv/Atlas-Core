@@ -133,14 +133,16 @@ async function createTicket(interaction, gc, info) {
   });
   if (count >= config.tickets.maxPerUser) throw new Error('You already have ' + count + ' open tickets.');
   const sanitized = interaction.user.username.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase().slice(0, 20);
-  const ch = await interaction.guild.channels.create({
-    name: 'ticket-' + sanitized, type: ChannelType.GuildText, parent: gc.category_id,
+  const chOpts = {
+    name: 'ticket-' + sanitized, type: ChannelType.GuildText,
     permissionOverwrites: [
       { id: interaction.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
       { id: uid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] },
       { id: gc.staff_role_id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
     ]
-  });
+  };
+  if (gc.category_id && gc.category_id.length > 10) chOpts.parent = gc.category_id;
+  const ch = await interaction.guild.channels.create(chOpts);
   u.tickets.set(ch.id, interaction.guild.id);
   const embed = new EmbedBuilder().setColor(gc.color).setTitle('Ticket').setDescription(info || gc.ticket_text);
   const close = new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setStyle(ButtonStyle.Danger);
@@ -196,7 +198,12 @@ async function handlePrefix(message) {
     switch (cmd) {
       case 'verify': await message.delete().catch(() => {}); await sendVerifyPanel(message.channel, gc); break;
       case 'roles': await message.delete().catch(() => {}); await sendRolePanel(message.channel, gc); break;
-      case 'ticket': await message.delete().catch(() => {}); await sendTicketHub(message.channel, gc); break;
+      case 'ticket': {
+        await message.delete().catch(() => {});
+        const tc = gc.ticket_panel_channel_id && message.guild.channels.cache.get(gc.ticket_panel_channel_id);
+        await sendTicketHub(tc || message.channel, gc);
+        break;
+      }
       case 'purge': {
         const amt = parseInt(args[0]);
         if (!amt || amt < 1 || amt > 100) return pd(message.channel, 'Specify 1-100.', 5000);
@@ -515,8 +522,14 @@ async function handleSlash(interaction) {
       case 'verify': await interaction.deferReply(ereply); await sendVerifyPanel(interaction.channel, gc); return interaction.editReply({ content: 'Panel deployed.' });
       case 'roles': await interaction.deferReply(ereply); await sendRolePanel(interaction.channel, gc); return interaction.editReply({ content: 'Panel deployed.' });
       case 'ticket': {
-        await interaction.deferReply(ereply);
         const sub = interaction.options.getSubcommand();
+        if (sub === 'panel') {
+          await interaction.deferReply(ereply);
+          const tc = gc.ticket_panel_channel_id && interaction.guild.channels.cache.get(gc.ticket_panel_channel_id);
+          await sendTicketHub(tc || interaction.channel, gc);
+          return interaction.editReply({ content: 'Ticket hub deployed.' });
+        }
+        await interaction.deferReply(ereply);
         if (sub === 'claim') {
           if (!u.tickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Not a ticket channel.' });
           u.claimedTickets.set(interaction.channel.id, interaction.user.id);
