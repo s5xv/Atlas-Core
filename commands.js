@@ -360,7 +360,6 @@ async function handlePrefix(message) {
     if (logCh) logCh.send('**Honeypot** | ' + message.author.tag + ' in #' + message.channel.name).catch(() => {});
     return;
   }
-  if (await runAutomod(message)) return;
   if (u.tickets.has(message.channel.id)) resetTicketAutoClose(message.channel.id, gc);
   if (!message.content.startsWith('!')) return;
   const args = message.content.slice(1).trim().split(/ +/);
