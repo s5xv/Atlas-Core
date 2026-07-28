@@ -1433,4 +1433,4 @@ async function exportServerConfig(guild, type) {
   return lines.join('\n');
 }
 
-module.exports = { handleMessageCreate, handleInteractionCreate, handleMessageUpdate, handleMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handleReady, exportServerConfig };eMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handl
+module.exports = { handleMessageCreate, handleInteractionCreate, handleMessageUpdate, handleMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handleReady, exportServerConfig };
