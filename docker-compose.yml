@@ -1,0 +1,11 @@
+version: '3'
+services:
+  atlas-core:
+    build: .
+    container_name: atlas-core
+    env_file: .env
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

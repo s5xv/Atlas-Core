@@ -45,12 +45,23 @@ function persistedSet(key) {
 }
 
 const warnings = persistedMap('warnings');
+const userJoinData = persistedMap('userJoinData');
+const ticketTranscripts = persistedMap('ticketTranscripts');
 const warnCounters = persistedMap('warnCounters');
 const notes = persistedMap('notes');
 const shadowbans = persistedSet('shadowbans');
 const honeypots = persistedMap('honeypots');
 const customPanels = persistedMap('customPanels');
 const customForms = persistedMap('customForms');
+const autoRoles = persistedMap('autoRoles');
+const welcomeConfigs = persistedMap('welcomeConfigs');
+const commandCooldowns = persistedMap('commandCooldowns');
+const userReputation = persistedMap('userReputation');
+const ticketSettings = persistedMap('ticketSettings');
+const serverStats = persistedMap('serverStats');
+const moderationCases = persistedMap('moderationCases');
+const tagResponses = persistedMap('tagResponses');
+const scheduledMessages = persistedMap('scheduledMessages');
 
 let pasteCounter = db.get('pasteCounter') || 0;
 function incPasteCounter() { pasteCounter++; db.set('pasteCounter', pasteCounter); }
@@ -203,7 +214,9 @@ const timezones = {
 module.exports = {
   antispam, tickets, ticketTimeouts, ticketPriority, warnings, warnCounters,
   commandStats, joinTimestamps, raidMode, countdowns, claimedTickets,
-  pastes, notes, shadowbans,   honeypots, customPanels, customForms, pasteCounter, incPasteCounter,
+  pastes, notes, shadowbans, honeypots, customPanels, customForms, pasteCounter, incPasteCounter,
+  userJoinData, ticketTranscripts, autoRoles, welcomeConfigs, commandCooldowns,
+  userReputation, ticketSettings, serverStats, moderationCases, tagResponses, scheduledMessages,
   getGuildConfig, hasStaffPermission, findStaffRoles, respond, parseDuration, formatDuration,
   trackCommand, logAudit, eightball, jokes, trivia, asciiArts, priorities, timezones
 };

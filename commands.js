@@ -1351,6 +1351,48 @@ function handleGuildMemberAdd(client, member) {
     const logCh = member.guild.channels.cache.get(gc.log_channel_id);
     if (logCh) logCh.send('**Raid Detection** | Channels locked.').catch(() => {});
   }
+  // Silent join log
+  const log = member.guild.channels.cache.get(gc.log_channel_id);
+  if (log) log.send('**Join** | ' + member.user.tag + ' (' + member.id + ')').catch(() => {});
+}
+
+function handleGuildMemberRemove(client, member) {
+  const gc = u.getGuildConfig(member.guild.id);
+  if (!gc) return;
+  const log = member.guild.channels.cache.get(gc.log_channel_id);
+  if (log) log.send('**Leave** | ' + member.user.tag + ' (' + member.id + ')').catch(() => {});
+}
+
+async function handleMessageUpdate(oldMessage, newMessage) {
+  if (newMessage.author?.bot || !newMessage.guild) return;
+  const gc = u.getGuildConfig(newMessage.guild.id);
+  if (!gc) return;
+  if (oldMessage.content === newMessage.content) return;
+  const log = newMessage.guild.channels.cache.get(gc.log_channel_id);
+  if (log) log.send('**Edit** | ' + newMessage.author.tag + ' in #' + newMessage.channel.name + '\nBefore: ' + (oldMessage.content || '*none*') + '\nAfter: ' + newMessage.content).catch(() => {});
+}
+
+async function handleMessageDelete(message) {
+  if (message.author?.bot || !message.guild) return;
+  const gc = u.getGuildConfig(message.guild.id);
+  if (!gc) return;
+  const log = message.guild.channels.cache.get(gc.log_channel_id);
+  if (log) log.send('**Delete** | ' + message.author.tag + ' in #' + message.channel.name + '\nContent: ' + (message.content || '*embed/sticker*')).catch(() => {});
+}
+
+async function handleVoiceStateUpdate(oldState, newState) {
+  const gc = u.getGuildConfig(newState.guild.id);
+  if (!gc) return;
+  const log = newState.guild.channels.cache.get(gc.log_channel_id);
+  if (!log) return;
+  const tag = newState.member?.user?.tag || 'Unknown';
+  if (!oldState.channelId && newState.channelId) {
+    log.send({ embeds: [new EmbedBuilder().setColor(0x2ECC71).setDescription('🔊 **' + tag + '** joined **' + newState.channel.name + '**').setTimestamp()] }).catch(() => {});
+  } else if (oldState.channelId && !newState.channelId) {
+    log.send({ embeds: [new EmbedBuilder().setColor(0xE74C3C).setDescription('🔇 **' + tag + '** left **' + oldState.channel.name + '**').setTimestamp()] }).catch(() => {});
+  } else if (oldState.channelId !== newState.channelId) {
+    log.send({ embeds: [new EmbedBuilder().setColor(0x3498DB).setDescription('🔃 **' + tag + '** moved **' + oldState.channel.name + '** → **' + newState.channel.name + '**').setTimestamp()] }).catch(() => {});
+  }
 }
 
 function handleReady(client) {
@@ -1391,4 +1433,4 @@ async function exportServerConfig(guild, type) {
   return lines.join('\n');
 }
 
-module.exports = { handleMessageCreate, handleInteractionCreate, handleGuildMemberAdd, handleReady, exportServerConfig };
+module.exports = { handleMessageCreate, handleInteractionCreate, handleMessageUpdate, handleMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handleReady, exportServerConfig };eMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handl
