@@ -186,7 +186,14 @@ const commands = [
   new SlashCommandBuilder().setName('eval').setDescription('Execute JavaScript code')
     .addStringOption(o => o.setName('code').setDescription('Code to run').setRequired(true)),
   new SlashCommandBuilder().setName('stats').setDescription('Show command usage stats'),
-  new SlashCommandBuilder().setName('sync').setDescription('Resync all slash commands')
+  new SlashCommandBuilder().setName('sync').setDescription('Resync all slash commands'),
+  new SlashCommandBuilder().setName('export').setDescription('Export server config (owner only)')
+    .addStringOption(o => o.setName('type').setDescription('What to export')
+      .addChoices(
+        { name: 'Channels', value: 'channels' },
+        { name: 'Roles', value: 'roles' },
+        { name: 'Both', value: 'both' }
+      ).setRequired(true))
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);

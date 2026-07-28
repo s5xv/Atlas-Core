@@ -771,6 +771,14 @@ async function handlePrefix(message) {
         break;
       }
       case 'sync': pd(message.channel, 'Run npm run deploy to resync slash commands.', 10000); break;
+      case 'export': {
+        if (message.author.id !== OWNER_ID) return pd(message.channel, 'Owner only.', 5000);
+        const type = args[0] || 'both';
+        const output = await exportServerConfig(message.guild, type);
+        await message.author.send({ files: [{ attachment: Buffer.from(output), name: message.guild.name + '-export.md' }] });
+        pd(message.channel, 'Export sent via DM.', 5000);
+        break;
+      }
     }
   } catch (e) { console.error('Prefix error:', e); }
 }
@@ -1148,6 +1156,14 @@ async function handleSlash(interaction) {
         break;
       }
       case 'sync': await interaction.deferReply(ereply); await interaction.editReply({ content: 'Run npm run deploy to resync.' }); break;
+      case 'export': {
+        if (interaction.user.id !== OWNER_ID) return u.respond(interaction, 'Owner only.');
+        const type = interaction.options.getString('type');
+        const content = await exportServerConfig(interaction.guild, type);
+        await interaction.user.send({ content: '```' + content + '```' }).catch(() => {});
+        await u.respond(interaction, 'Exported and sent via DM.');
+        break;
+      }
     }
   } catch (e) { console.error('Slash error:', e); }
 }
@@ -1345,4 +1361,32 @@ function handleReady(client) {
   }, 5000);
 }
 
-module.exports = { handleMessageCreate, handleInteractionCreate, handleGuildMemberAdd, handleReady };
+const OWNER_ID = '1250956931447652362';
+
+async function exportServerConfig(guild, type) {
+  const lines = ['# ' + guild.name + ' Export\n'];
+  if (type === 'roles' || type === 'both') {
+    lines.push('## Roles\n');
+    guild.roles.cache.filter(r => r.name !== '@everyone').sort((a, b) => b.position - a.position).forEach(r => {
+      lines.push('### ' + r.name);
+      lines.push('ID: ' + r.id + ' | Color: ' + r.hexColor + ' | Hoisted: ' + r.hoist + ' | Mentionable: ' + r.mentionable);
+      lines.push('Permissions: ' + (r.permissions.toArray().join(', ') || 'None'));
+      lines.push('');
+    });
+  }
+  if (type === 'channels' || type === 'both') {
+    lines.push('## Channels\n');
+    guild.channels.cache.sort((a, b) => a.position - b.position).forEach(c => {
+      if (c.type === 4) return;
+      lines.push('### #' + c.name);
+      lines.push('ID: ' + c.id + ' | Type: ' + c.type);
+      const perms = c.permissionOverwrites.cache.map(o => o.id + '=' + o.allow.toArray().join(',') + '|' + o.deny.toArray().join(',')).join(' | ');
+      if (perms) lines.push('Overwrites: ' + perms);
+      lines.push('');
+    });
+  }
+  lines.push('');
+  return lines.join('\n');
+}
+
+module.exports = { handleMessageCreate, handleInteractionCreate, handleGuildMemberAdd, handleReady, exportServerConfig };
