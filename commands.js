@@ -1140,6 +1140,13 @@ async function handleSlash(interaction) {
         if (!sorted.length) return interaction.editReply({ content: 'No stats yet.' });
         await interaction.editReply({ content: '**Stats**\n' + sorted.map(([k, v]) => k + ': ' + v).join('\n') }); break;
       }
+      case 'ping': {
+        const sent = await interaction.deferReply(ereply);
+        const ws = interaction.client.ws.ping;
+        const rtt = sent.createdTimestamp - interaction.createdTimestamp;
+        await interaction.editReply({ content: 'Pong! 🏓\nWebSocket: ' + ws + 'ms\nRoundtrip: ' + rtt + 'ms' });
+        break;
+      }
       case 'sync': await interaction.deferReply(ereply); await interaction.editReply({ content: 'Run npm run deploy to resync.' }); break;
     }
   } catch (e) { console.error('Slash error:', e); }
