@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DB_PATH = process.env.DB_PATH || '/data/data.json';
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data.json');
 
 let cache = null;
 
