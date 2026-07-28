@@ -962,7 +962,7 @@ async function handleSlash(interaction) {
       case 'paste': {
         const title = interaction.options.getString('title'); const content = interaction.options.getString('content');
         await interaction.deferReply(ereply); u.incPasteCounter();
-        u.pastes.set(u.pasteCounter, { title, content, author: interaction.user.tag, time: Date.now() });, time: Date.now() });
+        u.pastes.set(u.pasteCounter, { title, content, author: interaction.user.tag, time: Date.now() });
         await interaction.editReply({ content: 'Paste created. ID: ' + u.pasteCounter }); break;
       }
       case 'paste-get': {
