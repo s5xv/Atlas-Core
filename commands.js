@@ -573,7 +573,7 @@ async function handlePrefix(message) {
         const title = args[0];
         const content = args.slice(1).join(' ');
         if (!title || !content) return pd(message.channel, 'Usage: !paste <title> <content>', 5000);
-        u.pasteCounter++;
+        u.incPasteCounter();
         u.pastes.set(u.pasteCounter, { title, content, author: message.author.tag, time: Date.now() });
         pd(message.channel, 'Paste created. ID: ' + u.pasteCounter, 15000);
         break;
@@ -961,8 +961,8 @@ async function handleSlash(interaction) {
       case 'uptime': await interaction.reply({ content: 'Uptime: ' + u.formatDuration(process.uptime() * 1000), ...ereply }); break;
       case 'paste': {
         const title = interaction.options.getString('title'); const content = interaction.options.getString('content');
-        await interaction.deferReply(ereply); u.pasteCounter++;
-        u.pastes.set(u.pasteCounter, { title, content, author: interaction.user.tag, time: Date.now() });
+        await interaction.deferReply(ereply); u.incPasteCounter();
+        u.pastes.set(u.pasteCounter, { title, content, author: interaction.user.tag, time: Date.now() });, time: Date.now() });
         await interaction.editReply({ content: 'Paste created. ID: ' + u.pasteCounter }); break;
       }
       case 'paste-get': {

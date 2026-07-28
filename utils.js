@@ -1,25 +1,59 @@
 const { PermissionsBitField, Collection, EmbedBuilder } = require('discord.js');
 const config = require('./config');
+const db = require('./db');
 
 const antispam = new Collection();
 const tickets = new Collection();
 const ticketTimeouts = new Collection();
 const ticketPriority = new Collection();
-const warnings = new Collection();
-const warnCounters = new Collection();
 const commandStats = new Collection();
 const joinTimestamps = new Collection();
 const raidMode = new Collection();
 const countdowns = new Collection();
 const claimedTickets = new Collection();
 const pastes = new Collection();
-const notes = new Collection();
-const shadowbans = new Set();
-const honeypots = new Collection();
-const customPanels = new Collection();
-const customForms = new Collection();
 
-let pasteCounter = 0;
+function persistedMap(key) {
+  const data = db.get(key) || {};
+  return {
+    get(k) { return data[k]; },
+    set(k, v) { data[k] = v; db.set(key, data); },
+    has(k) { return k in data; },
+    delete(k) { const r = delete data[k]; db.set(key, data); return r; },
+    keys() { return Object.keys(data); },
+    values() { return Object.values(data); },
+    entries() { return Object.entries(data); },
+    forEach(fn) { Object.entries(data).forEach(([k, v]) => fn(v, k)); },
+    get size() { return Object.keys(data).length; },
+    clear() { db.set(key, {}); },
+    [Symbol.iterator]() { return Object.entries(data)[Symbol.iterator](); }
+  };
+}
+
+function persistedSet(key) {
+  const data = db.get(key) || [];
+  return {
+    has(k) { return data.includes(k); },
+    add(k) { if (!data.includes(k)) data.push(k); db.set(key, data); return this; },
+    delete(k) { const i = data.indexOf(k); if (i > -1) data.splice(i, 1); db.set(key, data); return i > -1; },
+    forEach(fn) { data.forEach(fn); },
+    get size() { return data.length; },
+    clear() { db.set(key, []); },
+    values() { return data.values(); },
+    [Symbol.iterator]() { return data[Symbol.iterator](); }
+  };
+}
+
+const warnings = persistedMap('warnings');
+const warnCounters = persistedMap('warnCounters');
+const notes = persistedMap('notes');
+const shadowbans = persistedSet('shadowbans');
+const honeypots = persistedMap('honeypots');
+const customPanels = persistedMap('customPanels');
+const customForms = persistedMap('customForms');
+
+let pasteCounter = db.get('pasteCounter') || 0;
+function incPasteCounter() { pasteCounter++; db.set('pasteCounter', pasteCounter); }
 
 function getGuildConfig(guildId) {
   return config.guilds[guildId] || null;
@@ -169,7 +203,7 @@ const timezones = {
 module.exports = {
   antispam, tickets, ticketTimeouts, ticketPriority, warnings, warnCounters,
   commandStats, joinTimestamps, raidMode, countdowns, claimedTickets,
-  pastes, notes, shadowbans,   honeypots, customPanels, customForms, pasteCounter,
+  pastes, notes, shadowbans,   honeypots, customPanels, customForms, pasteCounter, incPasteCounter,
   getGuildConfig, hasStaffPermission, findStaffRoles, respond, parseDuration, formatDuration,
   trackCommand, logAudit, eightball, jokes, trivia, asciiArts, priorities, timezones
 };
