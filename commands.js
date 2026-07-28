@@ -94,7 +94,9 @@ const PANELS = [
       { label: 'Support / Enquiry', value: 'atlas_support', modalId: 'spm_atlas_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
       { label: 'Apply for Employment', value: 'atlas_employ', modalId: 'spm_atlas_employ',
-        fields: [F('ign', 'In-Game Name'), F('position', 'Position Applying For'), F('experience', 'Prior Experience', P), F('why_hire', 'Why hire you?', P), F('bring', 'What do you bring to the team?', P)] }
+        fields: [F('ign', 'In-Game Name'), F('position', 'Position Applying For'), F('experience', 'Prior Experience', P), F('why_hire', 'Why hire you?', P), F('bring', 'What do you bring to the team?', P)] },
+      { label: 'Sponsor / Promote', value: 'atlas_sponsor', modalId: 'spm_atlas_sponsor',
+        fields: [F('ign_discord', 'Your IGN & Discord'), F('business', 'Business / Server Name'), F('type', 'Sponsorship or Promotion?'), F('details', 'Describe your offer in detail', P), F('budget', 'How much are you willing to sponsor?')] }
     ]
   },
   {
