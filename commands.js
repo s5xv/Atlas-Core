@@ -355,9 +355,11 @@ async function handlePrefix(message) {
   if (!gc) return;
   if (u.honeypots.has(message.channel.id) && !u.hasStaffPermission(message.member, gc)) {
     await message.delete().catch(() => {});
-    u.logAudit(message.guild, 'Honeypot Triggered', message.author, null, 'Sent message in honeypot channel');
+    let banned = false;
+    try { await message.member.ban({ reason: 'Honeypot trigger' }); banned = true; } catch {}
+    u.logAudit(message.guild, banned ? 'Honeypot Ban' : 'Honeypot Triggered', message.author, null, banned ? 'Banned for typing in honeypot channel' : 'Could not ban - role hierarchy');
     const logCh = message.guild.channels.cache.get(gc.log_channel_id);
-    if (logCh) logCh.send('**Honeypot** | ' + message.author.tag + ' in #' + message.channel.name).catch(() => {});
+    if (logCh) logCh.send((banned ? '**Honeypot Ban**' : '**Honeypot Trigger**') + ' | ' + message.author.tag + ' in #' + message.channel.name + (banned ? ' — Banned.' : ' — Could not ban (higher role).')).catch(() => {});
     return;
   }
   if (u.tickets.has(message.channel.id)) resetTicketAutoClose(message.channel.id, gc);
