@@ -812,7 +812,16 @@ async function handleSlash(interaction) {
         await interaction.deferReply(ereply);
         if (sub === 'claim') {
           if (!u.tickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Not a ticket channel.' });
+          if (!u.hasStaffPermission(interaction.member, gc)) return interaction.editReply({ content: 'Only staff can claim tickets.' });
+          if (u.claimedTickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Already claimed by <@' + u.claimedTickets.get(interaction.channel.id) + '>.' });
           u.claimedTickets.set(interaction.channel.id, interaction.user.id);
+          const existing = (await interaction.channel.messages.fetch({ limit: 10 })).find(m => m.embeds.length && m.embeds[0].title && m.embeds[0].title.startsWith('Ticket'));
+          if (existing) {
+            const embed = EmbedBuilder.from(existing.embeds[0]).setColor(gc.color);
+            embed.data.fields = embed.data.fields?.filter(f => f.name !== 'Claimed by') || [];
+            embed.addFields({ name: 'Claimed by', value: '<@' + interaction.user.id + '>', inline: true });
+            await existing.edit({ embeds: [embed] }).catch(() => {});
+          }
           return interaction.editReply({ content: 'Claimed by ' + interaction.user.tag + '.' });
         }
         if (sub === 'add') { const user = interaction.options.getUser('user'); await interaction.channel.permissionOverwrites.edit(user.id, { ViewChannel: true, SendMessages: true, ReadMessageHistory: true }).catch(() => {}); return interaction.editReply({ content: 'Added ' + user.tag + '.' }); }
@@ -1199,7 +1208,16 @@ async function handleButton(interaction) {
   }
   if (id === 'claim_ticket') {
     if (!u.tickets.has(interaction.channel.id)) return u.respond(interaction, 'Not a ticket.');
+    if (!u.hasStaffPermission(interaction.member, gc)) return u.respond(interaction, 'Only staff can claim tickets.');
+    if (u.claimedTickets.has(interaction.channel.id)) return u.respond(interaction, 'Already claimed by <@' + u.claimedTickets.get(interaction.channel.id) + '>.');
     u.claimedTickets.set(interaction.channel.id, interaction.user.id);
+    const existing = (await interaction.channel.messages.fetch({ limit: 10 })).find(m => m.embeds.length && m.embeds[0].title && m.embeds[0].title.startsWith('Ticket'));
+    if (existing) {
+      const embed = EmbedBuilder.from(existing.embeds[0]).setColor(gc.color);
+      embed.data.fields = embed.data.fields?.filter(f => f.name !== 'Claimed by') || [];
+      embed.addFields({ name: 'Claimed by', value: '<@' + interaction.user.id + '>', inline: true });
+      await existing.edit({ embeds: [embed] }).catch(() => {});
+    }
     return u.respond(interaction, 'Claimed by ' + interaction.user.tag + '.');
   }
   if (id.startsWith('role_')) {
