@@ -11,10 +11,6 @@ const client = new Client({
     GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildVoiceStates
   ],
   partials: [Partials.Channel]
-});uildMembers,
-    GatewayIntentBits.DirectMessages
-  ],
-  partials: [Partials.Channel]
 });
 
 const port = process.env.PORT || 3000;
