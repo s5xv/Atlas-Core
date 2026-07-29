@@ -820,9 +820,28 @@ async function handleSlash(interaction) {
             const embed = EmbedBuilder.from(existing.embeds[0]).setColor(gc.color);
             embed.data.fields = embed.data.fields?.filter(f => f.name !== 'Claimed by') || [];
             embed.addFields({ name: 'Claimed by', value: '<@' + interaction.user.id + '>', inline: true });
-            await existing.edit({ embeds: [embed] }).catch(() => {});
+            const closeRow = existing.components?.[0];
+            const claimBtn = ButtonBuilder.from(closeRow?.components?.[0] || new ButtonBuilder().setCustomId('claim_ticket').setLabel('Claim').setStyle(ButtonStyle.Primary)).setDisabled(true);
+            const closeBtn = ButtonBuilder.from(closeRow?.components?.[1] || new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setStyle(ButtonStyle.Danger));
+            await existing.edit({ embeds: [embed], components: [new ActionRowBuilder().addComponents(claimBtn, closeBtn)] }).catch(() => {});
           }
           return interaction.editReply({ content: 'Claimed by ' + interaction.user.tag + '.' });
+        }
+        if (sub === 'unclaim') {
+          if (!u.tickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Not a ticket channel.' });
+          if (!u.claimedTickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Not claimed.' });
+          if (u.claimedTickets.get(interaction.channel.id) !== interaction.user.id) return interaction.editReply({ content: 'Only the claimer can unclaim.' });
+          u.claimedTickets.delete(interaction.channel.id);
+          const existing = (await interaction.channel.messages.fetch({ limit: 10 })).find(m => m.embeds.length && m.embeds[0].title && m.embeds[0].title.startsWith('Ticket'));
+          if (existing) {
+            const embed = EmbedBuilder.from(existing.embeds[0]).setColor(gc.color);
+            embed.data.fields = embed.data.fields?.filter(f => f.name !== 'Claimed by') || [];
+            const closeRow = existing.components?.[0];
+            const claimBtn = ButtonBuilder.from(closeRow?.components?.[0] || new ButtonBuilder().setCustomId('claim_ticket').setLabel('Claim').setStyle(ButtonStyle.Primary)).setDisabled(false);
+            const closeBtn = ButtonBuilder.from(closeRow?.components?.[1] || new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setStyle(ButtonStyle.Danger));
+            await existing.edit({ embeds: [embed], components: [new ActionRowBuilder().addComponents(claimBtn, closeBtn)] }).catch(() => {});
+          }
+          return interaction.editReply({ content: 'Unclaimed by ' + interaction.user.tag + '.' });
         }
         if (sub === 'add') { const user = interaction.options.getUser('user'); await interaction.channel.permissionOverwrites.edit(user.id, { ViewChannel: true, SendMessages: true, ReadMessageHistory: true }).catch(() => {}); return interaction.editReply({ content: 'Added ' + user.tag + '.' }); }
         if (sub === 'remove') { const user = interaction.options.getUser('user'); await interaction.channel.permissionOverwrites.delete(user.id).catch(() => {}); return interaction.editReply({ content: 'Removed ' + user.tag + '.' }); }
@@ -1198,7 +1217,7 @@ async function handleButton(interaction) {
     });
     const logCh = interaction.guild.channels.cache.get(gc.log_channel_id);
     if (logCh && lines.length) logCh.send({ content: 'Ticket closed: #' + ch.name, files: [{ attachment: Buffer.from(lines.join('\n'), 'utf-8'), name: 'transcript-' + ch.name + '.txt' }] }).catch(() => {});
-    u.tickets.delete(ch.id); u.ticketTimeouts.delete(ch.id); u.ticketPriority.delete(ch.id);
+    u.tickets.delete(ch.id); u.ticketTimeouts.delete(ch.id); u.ticketPriority.delete(ch.id); u.claimedTickets.delete(ch.id);
     const staffRoleIds = validId(gc.staff_role_id) ? [gc.staff_role_id] : u.findStaffRoles(interaction.guild);
     const uid = ch.permissionOverwrites.cache.find(o => o.type === 1 && o.id !== interaction.user.id && !staffRoleIds.includes(o.id))?.id;
     await ch.delete().catch(() => {});
@@ -1216,7 +1235,10 @@ async function handleButton(interaction) {
       const embed = EmbedBuilder.from(existing.embeds[0]).setColor(gc.color);
       embed.data.fields = embed.data.fields?.filter(f => f.name !== 'Claimed by') || [];
       embed.addFields({ name: 'Claimed by', value: '<@' + interaction.user.id + '>', inline: true });
-      await existing.edit({ embeds: [embed] }).catch(() => {});
+      const closeRow = existing.components?.[0];
+      const claimBtn = ButtonBuilder.from(closeRow?.components?.[0] || new ButtonBuilder().setCustomId('claim_ticket').setLabel('Claim').setStyle(ButtonStyle.Primary)).setDisabled(true);
+      const closeBtn = ButtonBuilder.from(closeRow?.components?.[1] || new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setStyle(ButtonStyle.Danger));
+      await existing.edit({ embeds: [embed], components: [new ActionRowBuilder().addComponents(claimBtn, closeBtn)] }).catch(() => {});
     }
     return u.respond(interaction, 'Claimed by ' + interaction.user.tag + '.');
   }
