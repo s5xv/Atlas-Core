@@ -7,6 +7,7 @@ const commands = [
   new SlashCommandBuilder().setName('ticket').setDescription('Ticket management')
     .addSubcommand(s => s.setName('panel').setDescription('Deploy the ticket hub panel'))
     .addSubcommand(s => s.setName('claim').setDescription('Claim this ticket'))
+    .addSubcommand(s => s.setName('unclaim').setDescription('Unclaim this ticket'))
     .addSubcommand(s => s.setName('add').setDescription('Add a user to the ticket')
       .addUserOption(o => o.setName('user').setDescription('User to add').setRequired(true)))
     .addSubcommand(s => s.setName('remove').setDescription('Remove a user from the ticket')
