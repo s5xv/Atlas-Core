@@ -812,7 +812,7 @@ async function handleSlash(interaction) {
         await interaction.deferReply(ereply);
         if (sub === 'claim') {
           if (!u.tickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Not a ticket channel.' });
-          if (!u.hasStaffPermission(interaction.member, gc)) return interaction.editReply({ content: 'Only staff can claim tickets.' });
+          if (!interaction.member.roles.cache.has(gc.staff_role_id)) return interaction.editReply({ content: 'Only staff can claim tickets.' });
           if (u.claimedTickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Already claimed by <@' + u.claimedTickets.get(interaction.channel.id) + '>.' });
           u.claimedTickets.set(interaction.channel.id, interaction.user.id);
           const existing = (await interaction.channel.messages.fetch({ limit: 10 })).find(m => m.embeds.length && m.embeds[0].title && m.embeds[0].title.startsWith('Ticket'));
@@ -1208,7 +1208,7 @@ async function handleButton(interaction) {
   }
   if (id === 'claim_ticket') {
     if (!u.tickets.has(interaction.channel.id)) return u.respond(interaction, 'Not a ticket.');
-    if (!u.hasStaffPermission(interaction.member, gc)) return u.respond(interaction, 'Only staff can claim tickets.');
+    if (!interaction.member.roles.cache.has(gc.staff_role_id)) return u.respond(interaction, 'Only staff can claim tickets.');
     if (u.claimedTickets.has(interaction.channel.id)) return u.respond(interaction, 'Already claimed by <@' + u.claimedTickets.get(interaction.channel.id) + '>.');
     u.claimedTickets.set(interaction.channel.id, interaction.user.id);
     const existing = (await interaction.channel.messages.fetch({ limit: 10 })).find(m => m.embeds.length && m.embeds[0].title && m.embeds[0].title.startsWith('Ticket'));
