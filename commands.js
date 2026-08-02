@@ -15,18 +15,14 @@ const validId = s => typeof s === 'string' && /^\d{17,19}$/.test(s);
 const RULES_CHANNELS = {
   '1528793481273671832': '1528795598436962334',
   '1528796628457361449': '1528798892139741286',
-  '1528800629701480468': '1528802578488360970',
   '1528804420383674559': '1528807062094745812',
-  '1528807603197706332': '1528808770246021130',
   '1528809601674514502': '1528840197796532294'
 };
 
 const GUILD_PANEL_CHANNELS = {
   '1528793481273671832': '1528796269001183272',
   '1528796628457361449': '1528799506122936502',
-  '1528800629701480468': '1528804258684735498',
   '1528804420383674559': '1528807330433597451',
-  '1528807603197706332': '1528809161150959846',
   '1528809601674514502': '1528841128982351872'
 };
 
@@ -51,14 +47,6 @@ const RULES_DATA = {
       { name: '⚔️ RP Standards', value: '**1.** All network-related RP scenarios must be realistic.\n**2.** Service interruptions should follow proper escalation procedures.\n**3.** Customer data privacy must be maintained in-character.\n**4.** Security incidents require immediate reporting.\n**5.** Repairs and maintenance must be logged.' },
       { name: '🚫 Prohibited', value: '**1.** Exploiting network bugs is strictly forbidden.\n**2.** Macros or automation for network systems are prohibited.\n**3.** RMT of network services or equipment is forbidden.\n**4.** OOC harassment of customers or colleagues is grounds for dismissal.\n**5.** Alt accounts to evade restrictions are prohibited.' }
     ] },
-  '1528800629701480468': { color: 0x8E44AD, title: 'Hecate Cards — Official Rules & Regulations',
-    sections: [
-      { name: '📜 General Conduct', value: '**1.** All patrons and staff must behave respectfully.\n**2.** Follow staff and security instructions at all times.\n**3.** Impersonating employees or management is prohibited.\n**4.** Manipulating game outcomes is forbidden.\n**5.** Meta-gaming casino operations is prohibited.' },
-      { name: '💬 Communication', value: '**1.** Keep communications respectful and appropriate.\n**2.** Do not share game outcomes disruptively.\n**3.** Disputes must be submitted via formal ticket.\n**4.** Stay in-character in voice channels.\n**5.** No advertising competing establishments.' },
-      { name: '🎰 Gaming Rules', value: '**1.** All bets placed before each round starts.\n**2.** Bet limits are posted at each table.\n**3.** Sufficient funds required before betting.\n**4.** Cheating or advantage play is strictly prohibited.\n**5.** Tampering with equipment is forbidden.' },
-      { name: '💰 Payouts', value: '**1.** Winnings paid at conclusion of each round.\n**2.** Management decision on disputes is final.\n**3.** Chargebacks after payout may result in termination.\n**4.** Loyalty points awarded at management discretion.\n**5.** All transactions are recorded.' },
-      { name: '🚫 Prohibited', value: '**1.** Exploiting gaming system bugs is forbidden.\n**2.** Bots or automated betting are prohibited.\n**3.** RMT of chips or rewards is forbidden.\n**4.** Intimidating patrons or staff is grounds for removal.\n**5.** Alt accounts to bypass limits are prohibited.' }
-    ] },
   '1528804420383674559': { color: 0x1E4620, title: 'Plutus Bank — Official Rules & Regulations',
     sections: [
       { name: '📜 General Conduct', value: '**1.** Customers and staff must conduct themselves professionally.\n**2.** Follow teller, manager, and security instructions.\n**3.** Impersonating bank employees is a serious offence.\n**4.** All banking activities are monitored for security.\n**5.** Meta-gaming financial information is prohibited.' },
@@ -66,14 +54,6 @@ const RULES_DATA = {
       { name: '🏦 Banking Operations', value: '**1.** Deposits and withdrawals through authorised tellers only.\n**2.** Large transactions require manager approval.\n**3.** Account holders responsible for security.\n**4.** Loan applications subject to credit evaluation.\n**5.** Vault access restricted to authorised personnel.' },
       { name: '💰 Financial Regulations', value: '**1.** All transactions comply with in-character regulations.\n**2.** Interest rates subject to change with notice.\n**3.** Account closures processed in person.\n**4.** Overdrafts require prior arrangements.\n**5.** Fee disputes submitted in writing.' },
       { name: '🚫 Prohibited', value: '**1.** Exploiting banking glitches for gain is forbidden.\n**2.** Money laundering or financial crime is prohibited.\n**3.** RMT of in-game currency is forbidden.\n**4.** OOC threats to staff or customers are grounds for removal.\n**5.** Alt accounts to evade transaction limits are prohibited.' }
-    ] },
-  '1528807603197706332': { color: 0x8B0000, title: 'Nemesis Security — Official Rules & Regulations',
-    sections: [
-      { name: '📜 General Conduct', value: '**1.** All personnel must adhere to the code of conduct.\n**2.** Chain of command must be respected.\n**3.** Impersonating personnel or allies is prohibited.\n**4.** Operations must follow standard protocols.\n**5.** Meta-gaming operational info is forbidden.' },
-      { name: '💬 Communication', value: '**1.** Use proper radio discipline during operations.\n**2.** Classified info not discussed in public channels.\n**3.** Active operation comms take priority.\n**4.** After-action reports due within 24 hours.\n**5.** No discussing ops with external parties.' },
-      { name: '⚔️ Operations', value: '**1.** Force proportionate to threat level required.\n**2.** Patrols follow designated routes unless rerouted.\n**3.** Issued equipment is operator responsibility.\n**4.** Checkpoints follow standard procedures.\n**5.** Personnel must maintain deployment readiness.' },
-      { name: '🎯 Mission Conduct', value: '**1.** Mission parameters defined before deployment.\n**2.** Civilian casualties must be avoided.\n**3.** Captured individuals processed per procedure.\n**4.** Intelligence reported to command immediately.\n**5.** Rules of engagement set by command.' },
-      { name: '🚫 Prohibited', value: '**1.** Exploiting mechanics for tactical advantage is forbidden.\n**2.** Macros or third-party combat tools are prohibited.\n**3.** RMT of equipment or ranks is forbidden.\n**4.** OOC harassment is grounds for discharge.\n**5.** Alt accounts to bypass clearances are prohibited.' }
     ] },
   '1528809601674514502': { color: 0x78281F, title: 'Demeter Realty — Official Rules & Regulations',
     sections: [
@@ -111,17 +91,6 @@ const PANELS = [
     ]
   },
   {
-    guildId: '1528800629701480468', color: 0x8E44AD,
-    title: 'Hecate Cards Help Desk',
-    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
-    options: [
-      { label: 'Support / Enquiry', value: 'hecate_support', modalId: 'spm_hecate_support',
-        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
-      { label: 'Apply for Referee', value: 'hecate_referee', modalId: 'spm_hecate_referee',
-        fields: [F('ign', 'In-Game Name'), F('playtime', 'How long have you played?'), F('experience', 'Prior Experience', P), F('why_you', 'Why do you want this role?', P), F('bring', 'What do you bring to the team?', P)] }
-    ]
-  },
-  {
     guildId: '1528804420383674559', color: 0x1E4620,
     title: 'Plutus Bank Customer Support',
     description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
@@ -130,19 +99,6 @@ const PANELS = [
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
       { label: 'Apply for Teller', value: 'plutus_teller', modalId: 'spm_plutus_teller',
         fields: [F('ign', 'In-Game Name'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_work', 'Why work here?', P), F('bring', 'What do you bring to the team?', P)] }
-    ]
-  },
-  {
-    guildId: '1528807603197706332', color: 0x8B0000,
-    title: 'Nemesis Command Intake',
-    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
-    options: [
-      { label: 'Support / Enquiry', value: 'nemesis_support', modalId: 'spm_nemesis_support',
-        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
-      { label: 'Enlistment Application', value: 'nemesis_enlist', modalId: 'spm_nemesis_enlist',
-        fields: [F('ign', 'In-Game Name'), F('combat_exp', 'Combat Experience Level'), F('factions', 'Prior Factions'), F('why_enlist', 'Why enlist?', P), F('bring', 'What do you bring to the team?', P)] },
-      { label: 'Book a Game Session', value: 'nemesis_session', modalId: 'spm_nemesis_session',
-        fields: [F('ign', 'In-Game Name'), F('session_type', 'Session Type'), F('datetime', 'Preferred Date/Time'), F('players', 'Player Count'), F('goals', 'Goals/Notes', P)] }
     ]
   },
   {
