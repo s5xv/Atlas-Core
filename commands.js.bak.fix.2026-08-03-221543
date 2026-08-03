@@ -1188,7 +1188,15 @@ async function handleButton(interaction) {
     return u.respond(interaction, 'Verified.');
   }
   
-  
+  // --- LOAN TICKET BUTTON HANDLER START ---
+  if (id === 'open_loan_ticket') {
+    const gc = config.guilds[interaction.guild.id] || config.guilds['1528804420383674559'] || Object.values(config.guilds)[0]; // Fallback to Plutus Bank config
+    await interaction.deferReply({ ephemeral: true });
+    const ch = await createTicket(interaction, gc, 'Loan Support Ticket').catch(e => { interaction.editReply({ content: e.message }); return null; });
+    return;
+  }
+  // --- LOAN TICKET BUTTON HANDLER END ---
+
   if (id === 'close_ticket') {
     await interaction.deferReply({ ephemeral: true });
     const ch = interaction.channel; const fetched = await ch.messages.fetch({ limit: 100 }).catch(() => null);
@@ -1457,7 +1465,6 @@ async function exportServerConfig(guild, type) {
 
 module.exports = { handleMessageCreate, handleInteractionCreate, handleMessageUpdate, handleMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handleReady, exportServerConfig };
 
-
 // --- EXTRA FEATURES START ---
 const {
   ChannelType: ExtraChannelType,
@@ -1470,11 +1477,10 @@ const {
 
 const EXTRA_OWNER_ID = '1250956931447652362';
 
-const LOAN_OFFICER_ROLE_ID = '1528804776933064905';
-const BRANCH_MANAGER_ROLE_ID = '1528804643474509996';
-const PLUTUS_OWNER_ROLE_ID = '1528804473651068988';
-
-const PRIVATE_BANK_CATEGORY_NAME = '🏦 Private Banking';
+const PRIVATE_BANK_PANEL_CHANNEL_ID = '1533904422558634106';
+const PRIVATE_BANK_BRANCH_MANAGER_ROLE_ID = '1528804643474509996';
+const PRIVATE_BANK_MEMBER_ROLE_ID = '1528804420383674559';
+const ACCOUNTANT_ROLE_ID = 'if [ -z "$DISCORD_TOKEN" ]; then';
 
 const extraGiveaways = new Map();
 
@@ -1596,103 +1602,8 @@ async function extraEndGiveaway(messageId) {
   }
 }
 
-async function extraCreateTicketFromButton(interaction, info) {
-  const gc = extraGetGuildConfig(interaction.guild.id);
-
-  await interaction.deferReply({ flags: 64 }).catch(() => {});
-
-  if (typeof createTicket !== 'function') {
-    await interaction
-      .editReply({ content: 'Ticket system not found.' })
-      .catch(() => {});
-    return null;
-  }
-
-  const ch = await createTicket(interaction, gc, info).catch(async error => {
-    await interaction
-      .editReply({ content: error.message })
-      .catch(() => {});
-    return null;
-  });
-
-  return ch;
-}
-
-async function extraApplyOverwrites(interaction, ch, roleIds = []) {
-  await interaction.guild.roles.fetch().catch(() => {});
-
-  const allow = [
-    ExtraPermissionsBitField.Flags.ViewChannel,
-    ExtraPermissionsBitField.Flags.SendMessages,
-    ExtraPermissionsBitField.Flags.ReadMessageHistory,
-    ExtraPermissionsBitField.Flags.AttachFiles,
-    ExtraPermissionsBitField.Flags.EmbedLinks,
-  ];
-
-  const botAllow = [
-    ...allow,
-    ExtraPermissionsBitField.Flags.ManageChannels,
-    ExtraPermissionsBitField.Flags.ManageMessages,
-  ];
-
-  const overwrites = [
-    {
-      id: interaction.guild.roles.everyone.id,
-      deny: [
-        ExtraPermissionsBitField.Flags.ViewChannel,
-        ExtraPermissionsBitField.Flags.SendMessages,
-      ],
-    },
-    {
-      id: interaction.user.id,
-      allow,
-    },
-    {
-      id: interaction.client.user.id,
-      allow: botAllow,
-    },
-  ];
-
-  for (const roleId of roleIds) {
-    if (roleId && interaction.guild.roles.cache.has(roleId)) {
-      overwrites.push({
-        id: roleId,
-        allow,
-      });
-    }
-  }
-
-  await ch.permissionOverwrites.set(overwrites).catch(() => {});
-}
-
 async function handleExtraFeatures(interaction) {
   if (!interaction) return false;
-
-  // Loan ticket button
-  if (
-    interaction.isButton?.() &&
-    interaction.customId === 'open_loan_ticket'
-  ) {
-    if (!interaction.inGuild?.()) return true;
-
-    const ch = await extraCreateTicketFromButton(
-      interaction,
-      'Loan Support Ticket'
-    );
-
-    if (!ch) return true;
-
-    await extraApplyOverwrites(interaction, ch, [
-      LOAN_OFFICER_ROLE_ID,
-      BRANCH_MANAGER_ROLE_ID,
-    ]);
-
-    await interaction
-      .editReply({ content: `Loan ticket created: ${ch}` })
-      .catch(() => {});
-
-    return true;
-  }
 
   // Private Banking ticket button
   if (
@@ -1703,31 +1614,99 @@ async function handleExtraFeatures(interaction) {
 
     const member = interaction.member;
 
-    const canOpen =
-      member?.roles?.cache?.has(BRANCH_MANAGER_ROLE_ID) ||
-      member?.roles?.cache?.has(PLUTUS_OWNER_ROLE_ID) ||
+    const isBranchManager =
+      member?.roles?.cache?.has(PRIVATE_BANK_BRANCH_MANAGER_ROLE_ID) ||
       member?.permissions?.has(ExtraPermissionsBitField.Flags.Administrator);
 
-    if (!canOpen) {
+    if (!isBranchManager) {
       await interaction.reply({
-        content:
-          'Only Branch Managers or Plutus Owner can open this private banking ticket.',
+        content: 'Only Branch Managers can open this private banking ticket.',
         flags: 64,
       });
       return true;
     }
 
-    const ch = await extraCreateTicketFromButton(
-      interaction,
-      'Private Banking Ticket'
+    const gc = extraGetGuildConfig(interaction.guild.id);
+
+    await interaction.deferReply({ flags: 64 }).catch(() => {});
+
+    if (typeof createTicket !== 'function') {
+      await interaction
+        .editReply({ content: 'Ticket system not found.' })
+        .catch(() => {});
+      return true;
+    }
+
+    const ch = await createTicket(interaction, gc, 'Private Banking Ticket').catch(
+      async error => {
+        await interaction
+          .editReply({ content: error.message })
+          .catch(() => {});
+        return null;
+      }
     );
 
     if (!ch) return true;
 
+    await interaction.guild.roles.fetch().catch(() => {});
+
+    const baseAllow = [
+      ExtraPermissionsBitField.Flags.ViewChannel,
+      ExtraPermissionsBitField.Flags.SendMessages,
+      ExtraPermissionsBitField.Flags.ReadMessageHistory,
+      ExtraPermissionsBitField.Flags.AttachFiles,
+      ExtraPermissionsBitField.Flags.EmbedLinks,
+    ];
+
+    const botAllow = [
+      ...baseAllow,
+      ExtraPermissionsBitField.Flags.ManageChannels,
+      ExtraPermissionsBitField.Flags.ManageMessages,
+    ];
+
+    const everyoneId = interaction.guild.roles.everyone.id;
+
+    const roleIds = [
+      PRIVATE_BANK_BRANCH_MANAGER_ROLE_ID,
+      PRIVATE_BANK_MEMBER_ROLE_ID,
+      ACCOUNTANT_ROLE_ID,
+    ].filter(
+      id =>
+        id &&
+        !String(id).includes('PASTE') &&
+        String(id) !== everyoneId &&
+        interaction.guild.roles.cache.has(String(id))
+    );
+
+    const overwrites = [
+      {
+        id: everyoneId,
+        deny: [
+          ExtraPermissionsBitField.Flags.ViewChannel,
+          ExtraPermissionsBitField.Flags.SendMessages,
+        ],
+      },
+      {
+        id: interaction.user.id,
+        allow: baseAllow,
+      },
+      {
+        id: interaction.client.user.id,
+        allow: botAllow,
+      },
+    ];
+
+    for (const roleId of roleIds) {
+      overwrites.push({
+        id: roleId,
+        allow: baseAllow,
+      });
+    }
+
     const category = interaction.guild.channels.cache.find(
       c =>
         c.type === ExtraChannelType.GuildCategory &&
-        c.name === PRIVATE_BANK_CATEGORY_NAME
+        c.name === '🏦 Private Banking'
     );
 
     if (category) {
@@ -1736,10 +1715,7 @@ async function handleExtraFeatures(interaction) {
         .catch(() => {});
     }
 
-    await extraApplyOverwrites(interaction, ch, [
-      BRANCH_MANAGER_ROLE_ID,
-      PLUTUS_OWNER_ROLE_ID,
-    ]);
+    await ch.permissionOverwrites.set(overwrites).catch(() => {});
 
     const safeUser = interaction.user.username
       .toLowerCase()
@@ -1751,8 +1727,9 @@ async function handleExtraFeatures(interaction) {
       .catch(() => {});
 
     await interaction
-      .editReply({
-        content: `Private Banking ticket created: ${ch}\nUse \`/ticket add\` to add users manually.`,
+      .followUp({
+        content: `Private Banking ticket ready: ${ch}`,
+        flags: 64,
       })
       .catch(() => {});
 
@@ -1826,8 +1803,7 @@ async function handleExtraFeatures(interaction) {
 
     if (!ms) {
       await interaction.reply({
-        content:
-          'Invalid duration. Use examples like `10s`, `5m`, `2h`, or `1d`.',
+        content: 'Invalid duration. Use examples like `10s`, `5m`, `2h`, or `1d`.',
         flags: 64,
       });
       return true;
@@ -1876,8 +1852,7 @@ async function handleExtraFeatures(interaction) {
   return false;
 }
 
-const __originalHandleInteractionCreate =
-  module.exports.handleInteractionCreate;
+const __originalHandleInteractionCreate = module.exports.handleInteractionCreate;
 
 module.exports.handleInteractionCreate = async function (...args) {
   const interaction = args[0];

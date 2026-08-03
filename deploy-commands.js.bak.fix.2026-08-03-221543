@@ -194,31 +194,7 @@ const commands = [
         { name: 'Channels', value: 'channels' },
         { name: 'Roles', value: 'roles' },
         { name: 'Both', value: 'both' }
-      ).setRequired(true)),
-  new SlashCommandBuilder()
-    .setName('giveaway')
-    .setDescription('Create a giveaway. Owner only.')
-    .setDMPermission(false)
-    .addStringOption(option =>
-      option
-        .setName('prize')
-        .setDescription('What are you giving away?')
-        .setRequired(true)
-    )
-    .addStringOption(option =>
-      option
-        .setName('duration')
-        .setDescription('Example: 30s, 5m, 2h, 1d')
-        .setRequired(true)
-    )
-    .addIntegerOption(option =>
-      option
-        .setName('winners')
-        .setDescription('Number of winners')
-        .setRequired(false)
-        .setMinValue(1)
-        .setMaxValue(20)
-    )
+      ).setRequired(true))
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
