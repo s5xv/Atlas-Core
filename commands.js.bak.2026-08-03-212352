@@ -272,30 +272,6 @@ async function createTicket(interaction, gc, info) {
   ];
   if (validId(gc.staff_role_id)) overwrites.push({ id: gc.staff_role_id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] });
   else u.findStaffRoles(interaction.guild).forEach(rid => overwrites.push({ id: rid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }));
-  
-  // --- CONDITIONAL TICKET PERMISSIONS START ---
-  const sourceChannelId = interaction.channelId;
-  overwrites.length = 0; // Clear existing to enforce routing
-  overwrites.push(
-    { id: interaction.guild.roles.everyone.id, deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] },
-    { id: interaction.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.AttachFiles, PermissionsBitField.Flags.EmbedLinks] },
-    { id: interaction.client.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageMessages] }
-  );
-
-  if (sourceChannelId === '1533885991130235027') { // #🏧-loans
-    overwrites.push(
-      { id: '1528804776933064905', allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }, // Loan Officer
-      { id: '1528804643474509996', allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }  // Branch Manager
-    );
-  } else if (sourceChannelId === '1528807330433597451') { // #🎫-open-a-ticket
-    overwrites.push(
-      { id: '1531770145473560596', allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] } // Teller
-    );
-  } else {
-    if (gc.staff_role_id) overwrites.push({ id: gc.staff_role_id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] });
-  }
-  // --- CONDITIONAL TICKET PERMISSIONS END ---
-
   const chOpts = { name: 'ticket-' + sanitized, type: ChannelType.GuildText, permissionOverwrites: overwrites };
   if (validId(gc.category_id)) chOpts.parent = gc.category_id;
   const ch = await interaction.guild.channels.create(chOpts);
@@ -1187,16 +1163,6 @@ async function handleButton(interaction) {
     if (gc.unverified_role_id?.length > 5) await interaction.member.roles.remove(gc.unverified_role_id).catch(() => {});
     return u.respond(interaction, 'Verified.');
   }
-  
-  // --- LOAN TICKET BUTTON HANDLER START ---
-  if (id === 'open_loan_ticket') {
-    const gc = config.guilds.find(g => g.id === interaction.guild.id) || config.guilds[2]; // Fallback to Plutus Bank config
-    await interaction.deferReply({ ephemeral: true });
-    const ch = await createTicket(interaction, gc, 'Loan Support Ticket').catch(e => { interaction.editReply({ content: e.message }); return null; });
-    return;
-  }
-  // --- LOAN TICKET BUTTON HANDLER END ---
-
   if (id === 'close_ticket') {
     await interaction.deferReply({ ephemeral: true });
     const ch = interaction.channel; const fetched = await ch.messages.fetch({ limit: 100 }).catch(() => null);
