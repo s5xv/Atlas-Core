@@ -1146,7 +1146,7 @@ async function handleSlash(interaction) {
         if (interaction.user.id !== OWNER_ID) return u.respond(interaction, 'Owner only.');
         const type = interaction.options.getString('type');
         const content = await exportServerConfig(interaction.guild, type);
-        await interaction.user.send({ content: '```' + content + '```' }).catch(() => {});
+        await interaction.user.send({ files: [{ attachment: Buffer.from(content, 'utf-8'), name: interaction.guild.name + '-export.md' }] }).catch(() => {});
         await u.respond(interaction, 'Exported and sent via DM.');
         break;
       }
