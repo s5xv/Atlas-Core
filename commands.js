@@ -1950,7 +1950,10 @@ const __originalHandleInteractionCreate =
   module.exports.handleInteractionCreate;
 
 module.exports.handleInteractionCreate = async function (...args) {
-  const interaction = args[0];
+  // Fix: index.js passes (client, interaction), so interaction is args[1]
+  let interaction = args.find(arg => arg && (typeof arg.isButton === 'function' || typeof arg.isChatInputCommand === 'function' || arg.customId || arg.commandName));
+  if (!interaction && args.length > 1) interaction = args[1];
+  else if (!interaction) interaction = args[0];
 
   try {
     const handled = await handleExtraFeatures(interaction);
