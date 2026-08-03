@@ -1190,7 +1190,7 @@ async function handleButton(interaction) {
   
   // --- LOAN TICKET BUTTON HANDLER START ---
   if (id === 'open_loan_ticket') {
-    const gc = config.guilds.find(g => g.id === interaction.guild.id) || config.guilds[2]; // Fallback to Plutus Bank config
+    const gc = config.guilds[interaction.guild.id] || config.guilds['1528804420383674559'] || Object.values(config.guilds)[0]; // Fallback to Plutus Bank config
     await interaction.deferReply({ ephemeral: true });
     const ch = await createTicket(interaction, gc, 'Loan Support Ticket').catch(e => { interaction.editReply({ content: e.message }); return null; });
     return;
