@@ -1458,10 +1458,7 @@ async function exportServerConfig(guild, type) {
 module.exports = { handleMessageCreate, handleInteractionCreate, handleMessageUpdate, handleMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handleReady, exportServerConfig };
 
 
-
 // --- EXTRA FEATURES START ---
-console.log('[ExtraFeatures] Extra features block loaded.');
-
 const {
   ChannelType: ExtraChannelType,
   PermissionsBitField: ExtraPermissionsBitField,
@@ -1532,18 +1529,6 @@ function extraGetGuildConfig(guildId) {
   );
 }
 
-async function extraSafeFollowUp(interaction, content) {
-  try {
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({ content, ephemeral: true });
-    } else {
-      await interaction.reply({ content, ephemeral: true });
-    }
-  } catch (error) {
-    console.error('[ExtraFeatures] extraSafeFollowUp failed:', error);
-  }
-}
-
 function extraGiveawayEmbed(g) {
   return new ExtraEmbedBuilder()
     .setTitle(g.ended ? '🎁 Giveaway Ended' : '🎁 Giveaway')
@@ -1594,9 +1579,7 @@ async function extraEndGiveaway(messageId) {
       embeds: [extraGiveawayEmbed(g)],
       components: [disabledRow],
     })
-    .catch(error => {
-      console.error('[ExtraFeatures] Failed to edit giveaway message:', error);
-    });
+    .catch(() => {});
 
   if (winners.length > 0) {
     await g.message.channel
@@ -1605,44 +1588,30 @@ async function extraEndGiveaway(messageId) {
           .map(id => `<@${id}>`)
           .join(', ')}`,
       })
-      .catch(error => {
-        console.error('[ExtraFeatures] Failed to announce giveaway winner:', error);
-      });
+      .catch(() => {});
   } else {
     await g.message.channel
       .send({ content: '🎉 **Giveaway ended!** No one entered.' })
-      .catch(error => {
-        console.error('[ExtraFeatures] Failed to announce giveaway end:', error);
-      });
+      .catch(() => {});
   }
 }
 
 async function extraCreateTicketFromButton(interaction, info) {
-  console.log(
-    '[ExtraFeatures] Creating ticket:',
-    info,
-    'for user',
-    interaction.user.id
-  );
-
   const gc = extraGetGuildConfig(interaction.guild.id);
 
-  await interaction.deferReply({ ephemeral: true }).catch(error => {
-    console.error('[ExtraFeatures] deferReply failed:', error);
-  });
+  await interaction.deferReply({ flags: 64 }).catch(() => {});
 
   if (typeof createTicket !== 'function') {
-    console.error('[ExtraFeatures] createTicket is not a function.');
-    await extraSafeFollowUp(interaction, 'Ticket system not found.');
+    await interaction
+      .editReply({ content: 'Ticket system not found.' })
+      .catch(() => {});
     return null;
   }
 
   const ch = await createTicket(interaction, gc, info).catch(async error => {
-    console.error('[ExtraFeatures] createTicket failed:', error);
-    await extraSafeFollowUp(
-      interaction,
-      error.message || 'Ticket creation failed.'
-    );
+    await interaction
+      .editReply({ content: error.message })
+      .catch(() => {});
     return null;
   });
 
@@ -1693,9 +1662,7 @@ async function extraApplyOverwrites(interaction, ch, roleIds = []) {
     }
   }
 
-  await ch.permissionOverwrites.set(overwrites).catch(error => {
-    console.error('[ExtraFeatures] Failed to set ticket overwrites:', error);
-  });
+  await ch.permissionOverwrites.set(overwrites).catch(() => {});
 }
 
 async function handleExtraFeatures(interaction) {
@@ -1706,8 +1673,6 @@ async function handleExtraFeatures(interaction) {
     interaction.isButton?.() &&
     interaction.customId === 'open_loan_ticket'
   ) {
-    console.log('[ExtraFeatures] open_loan_ticket clicked.');
-
     if (!interaction.inGuild?.()) return true;
 
     const ch = await extraCreateTicketFromButton(
@@ -1722,7 +1687,9 @@ async function handleExtraFeatures(interaction) {
       BRANCH_MANAGER_ROLE_ID,
     ]);
 
-    await extraSafeFollowUp(interaction, `Loan ticket created: ${ch}`);
+    await interaction
+      .editReply({ content: `Loan ticket created: ${ch}` })
+      .catch(() => {});
 
     return true;
   }
@@ -1732,13 +1699,9 @@ async function handleExtraFeatures(interaction) {
     interaction.isButton?.() &&
     interaction.customId === 'open_private_bank_ticket'
   ) {
-    console.log('[ExtraFeatures] open_private_bank_ticket clicked.');
-
     if (!interaction.inGuild?.()) return true;
 
-    const member = await interaction.guild.members
-      .fetch(interaction.user.id)
-      .catch(() => interaction.member);
+    const member = interaction.member;
 
     const canOpen =
       member?.roles?.cache?.has(BRANCH_MANAGER_ROLE_ID) ||
@@ -1746,13 +1709,11 @@ async function handleExtraFeatures(interaction) {
       member?.permissions?.has(ExtraPermissionsBitField.Flags.Administrator);
 
     if (!canOpen) {
-      await interaction
-        .reply({
-          content:
-            'Only Branch Managers or Plutus Owner can open this private banking ticket.',
-          ephemeral: true,
-        })
-        .catch(() => {});
+      await interaction.reply({
+        content:
+          'Only Branch Managers or Plutus Owner can open this private banking ticket.',
+        flags: 64,
+      });
       return true;
     }
 
@@ -1772,12 +1733,7 @@ async function handleExtraFeatures(interaction) {
     if (category) {
       await ch
         .setParent(category.id, { lockPermissions: false })
-        .catch(error => {
-          console.error(
-            '[ExtraFeatures] Failed to move private ticket to category:',
-            error
-          );
-        });
+        .catch(() => {});
     }
 
     await extraApplyOverwrites(interaction, ch, [
@@ -1794,10 +1750,11 @@ async function handleExtraFeatures(interaction) {
       .setName(`private-${safeUser}-${interaction.user.id.slice(-4)}`)
       .catch(() => {});
 
-    await extraSafeFollowUp(
-      interaction,
-      `Private Banking ticket created: ${ch}\nUse \`/ticket add\` to add users manually.`
-    );
+    await interaction
+      .editReply({
+        content: `Private Banking ticket created: ${ch}\nUse \`/ticket add\` to add users manually.`,
+      })
+      .catch(() => {});
 
     return true;
   }
@@ -1807,27 +1764,21 @@ async function handleExtraFeatures(interaction) {
     interaction.isButton?.() &&
     interaction.customId === 'giveaway_join'
   ) {
-    console.log('[ExtraFeatures] giveaway_join clicked.');
-
     const g = extraGiveaways.get(interaction.message.id);
 
     if (!g || g.ended) {
-      await interaction
-        .reply({
-          content: 'This giveaway is not active.',
-          ephemeral: true,
-        })
-        .catch(() => {});
+      await interaction.reply({
+        content: 'This giveaway is not active.',
+        flags: 64,
+      });
       return true;
     }
 
     if (g.entries.has(interaction.user.id)) {
-      await interaction
-        .reply({
-          content: 'You are already in this giveaway.',
-          ephemeral: true,
-        })
-        .catch(() => {});
+      await interaction.reply({
+        content: 'You are already in this giveaway.',
+        flags: 64,
+      });
       return true;
     }
 
@@ -1838,9 +1789,7 @@ async function handleExtraFeatures(interaction) {
         embeds: [extraGiveawayEmbed(g)],
         components: interaction.message.components,
       })
-      .catch(error => {
-        console.error('[ExtraFeatures] Failed to update giveaway embed:', error);
-      });
+      .catch(() => {});
 
     return true;
   }
@@ -1850,95 +1799,76 @@ async function handleExtraFeatures(interaction) {
     interaction.isChatInputCommand?.() &&
     interaction.commandName === 'giveaway'
   ) {
-    console.log(
-      '[ExtraFeatures] /giveaway command used by',
-      interaction.user.id
+    if (interaction.user.id !== EXTRA_OWNER_ID) {
+      await interaction.reply({
+        content: 'Only the owner can create giveaways.',
+        flags: 64,
+      });
+      return true;
+    }
+
+    if (!interaction.channel?.send) {
+      await interaction.reply({
+        content: 'This can only be used in a server channel.',
+        flags: 64,
+      });
+      return true;
+    }
+
+    const prize = interaction.options.getString('prize', true);
+    const duration = interaction.options.getString('duration', true);
+    const winners = Math.max(
+      1,
+      interaction.options.getInteger('winners') || 1
     );
 
-    try {
-      if (interaction.user.id !== EXTRA_OWNER_ID) {
-        await interaction
-          .reply({
-            content: 'Only the owner can create giveaways.',
-            ephemeral: true,
-          })
-          .catch(() => {});
-        return true;
-      }
+    const ms = extraParseDuration(duration);
 
-      if (!interaction.channel?.send) {
-        await interaction
-          .reply({
-            content: 'This can only be used in a server channel.',
-            ephemeral: true,
-          })
-          .catch(() => {});
-        return true;
-      }
-
-      const prize = interaction.options.getString('prize', true);
-      const duration = interaction.options.getString('duration', true);
-      const winners = Math.max(
-        1,
-        interaction.options.getInteger('winners') || 1
-      );
-
-      const ms = extraParseDuration(duration);
-
-      if (!ms) {
-        await interaction
-          .reply({
-            content:
-              'Invalid duration. Use examples like `10s`, `5m`, `2h`, or `1d`.',
-            ephemeral: true,
-          })
-          .catch(() => {});
-        return true;
-      }
-
-      await interaction.deferReply({ ephemeral: true }).catch(error => {
-        console.error('[ExtraFeatures] giveaway deferReply failed:', error);
+    if (!ms) {
+      await interaction.reply({
+        content:
+          'Invalid duration. Use examples like `10s`, `5m`, `2h`, or `1d`.',
+        flags: 64,
       });
-
-      const endsAt = Date.now() + ms;
-
-      const g = {
-        prize,
-        winners,
-        hostId: interaction.user.id,
-        endsAt,
-        entries: new Set(),
-        ended: false,
-        channelId: interaction.channel.id,
-        message: null,
-      };
-
-      const row = new ExtraActionRowBuilder().addComponents(
-        new ExtraButtonBuilder()
-          .setCustomId('giveaway_join')
-          .setLabel('Join Giveaway')
-          .setStyle(ExtraButtonStyle.Primary)
-          .setEmoji('🎉')
-      );
-
-      const msg = await interaction.channel.send({
-        embeds: [extraGiveawayEmbed(g)],
-        components: [row],
-      });
-
-      g.message = msg;
-      extraGiveaways.set(msg.id, g);
-
-      setTimeout(() => extraEndGiveaway(msg.id), ms);
-
-      await extraSafeFollowUp(interaction, `Giveaway created: ${msg.url}`);
-    } catch (error) {
-      console.error('[ExtraFeatures] /giveaway handler failed:', error);
-      await extraSafeFollowUp(
-        interaction,
-        'Giveaway failed: ' + (error.message || 'Unknown error')
-      );
+      return true;
     }
+
+    await interaction.deferReply({ flags: 64 }).catch(() => {});
+
+    const endsAt = Date.now() + ms;
+
+    const g = {
+      prize,
+      winners,
+      hostId: interaction.user.id,
+      endsAt,
+      entries: new Set(),
+      ended: false,
+      channelId: interaction.channel.id,
+      message: null,
+    };
+
+    const row = new ExtraActionRowBuilder().addComponents(
+      new ExtraButtonBuilder()
+        .setCustomId('giveaway_join')
+        .setLabel('Join Giveaway')
+        .setStyle(ExtraButtonStyle.Primary)
+        .setEmoji('🎉')
+    );
+
+    const msg = await interaction.channel.send({
+      embeds: [extraGiveawayEmbed(g)],
+      components: [row],
+    });
+
+    g.message = msg;
+    extraGiveaways.set(msg.id, g);
+
+    setTimeout(() => extraEndGiveaway(msg.id), ms);
+
+    await interaction
+      .editReply({ content: `Giveaway created: ${msg.url}` })
+      .catch(() => {});
 
     return true;
   }
@@ -1956,23 +1886,7 @@ module.exports.handleInteractionCreate = async function (...args) {
     const handled = await handleExtraFeatures(interaction);
     if (handled) return;
   } catch (error) {
-    console.error('[ExtraFeatures] handler error:', error);
-
-    try {
-      if (interaction && !interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: 'Internal interaction error.',
-          ephemeral: true,
-        });
-      } else if (interaction && (interaction.replied || interaction.deferred)) {
-        await interaction.followUp({
-          content: 'Internal interaction error.',
-          ephemeral: true,
-        });
-      }
-    } catch {}
-
-    return;
+    console.error('Extra features error:', error);
   }
 
   if (__originalHandleInteractionCreate) {
