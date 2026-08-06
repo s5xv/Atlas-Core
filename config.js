@@ -41,13 +41,13 @@ module.exports = {
       ]
     },
     "1534966276290646027": {
-      name: "Z&E Realty", color: "#78281F", staff_role_id: "STAFF_ROLE_ID",
-      member_role_id: "", unverified_role_id: "",
-      category_id: "", ticket_panel_channel_id: "PANEL_CHANNEL_ID", log_channel_id: "", audit_channel_id: "",
+      name: "Z&E Realty", color: "#78281F", staff_role_id: "1534967563346251968",
+      member_role_id: "1534967573832269904", unverified_role_id: "",
+      category_id: "1534967593926922290", ticket_panel_channel_id: "1534967624440611006", log_channel_id: "1534967622037147822", audit_channel_id: "1534967622037147822",
       ticket_text: "Z&E Realty support. Let us know how we can assist you.",
       notification_roles: [
-        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
-        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+        { label: "Update Pings", role_id: "1534967580220063804" },
+        { label: "Event Pings", role_id: "1534967578571571392" }
       ]
     }
   },
