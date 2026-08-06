@@ -39,6 +39,16 @@ module.exports = {
         { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
         { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
       ]
+    },
+    "1534966276290646027": {
+      name: "Z&E Realty", color: "#78281F", staff_role_id: "STAFF_ROLE_ID",
+      member_role_id: "", unverified_role_id: "",
+      category_id: "", ticket_panel_channel_id: "PANEL_CHANNEL_ID", log_channel_id: "", audit_channel_id: "",
+      ticket_text: "Z&E Realty support. Let us know how we can assist you.",
+      notification_roles: [
+        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
+        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
+      ]
     }
   },
 

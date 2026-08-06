@@ -16,14 +16,16 @@ const RULES_CHANNELS = {
   '1528793481273671832': '1528795598436962334',
   '1528796628457361449': '1528798892139741286',
   '1528804420383674559': '1528807062094745812',
-  '1528809601674514502': '1528840197796532294'
+  '1528809601674514502': '1528840197796532294',
+  '1534966276290646027': ''
 };
 
 const GUILD_PANEL_CHANNELS = {
   '1528793481273671832': '1528796269001183272',
   '1528796628457361449': '1528799506122936502',
   '1528804420383674559': '1528807330433597451',
-  '1528809601674514502': '1528841128982351872'
+  '1528809601674514502': '1528841128982351872',
+  '1534966276290646027': ''
 };
 
 const F = (id, label, style = TextInputStyle.Short, required = true) => ({ id, label, style, required });
@@ -60,6 +62,14 @@ const RULES_DATA = {
       { name: '📜 General Conduct', value: '**1.** All clients, agents, and staff must act with integrity.\n**2.** Follow agent and management instructions.\n**3.** Impersonating agents or inspectors is prohibited.\n**4.** All transactions must be fully documented.\n**5.** Meta-gaming property values is prohibited.' },
       { name: '💬 Communication', value: '**1.** Property communications must be professional.\n**2.** Client confidentiality must be maintained.\n**3.** Use appropriate channels for listings and negotiations.\n**4.** Offers through authorised agents only.\n**5.** Advertising competing realty services is prohibited.' },
       { name: '🏠 Property Rules', value: '**1.** Listings must include accurate descriptions and pricing.\n**2.** Properties must be inspected before listing.\n**3.** Commissions are standardised.\n**4.** Exclusive listings honoured for duration.\n**5.** All sales through official Demeter channels.' },
+      { name: '📋 Agent Standards', value: '**1.** Agents must maintain active licensure.\n**2.** Conflicts of interest must be disclosed.\n**3.** Agents responsible for listing accuracy.\n**4.** Client funds follow trust accounting.\n**5.** Enquiry responses within 24 hours required.' },
+      { name: '🚫 Prohibited', value: '**1.** Exploiting property system bugs is forbidden.\n**2.** Automation for property interactions is prohibited.\n**3.** RMT of properties or deeds is forbidden.\n**4.** OOC harassment is grounds for termination.\n**5.** Alt accounts to bypass ownership limits are prohibited.' }
+    ] },
+  '1534966276290646027': { color: 0x78281F, title: 'Z&E Realty — Official Rules & Regulations',
+    sections: [
+      { name: '📜 General Conduct', value: '**1.** All clients, agents, and staff must act with integrity.\n**2.** Follow agent and management instructions.\n**3.** Impersonating agents or inspectors is prohibited.\n**4.** All transactions must be fully documented.\n**5.** Meta-gaming property values is prohibited.' },
+      { name: '💬 Communication', value: '**1.** Property communications must be professional.\n**2.** Client confidentiality must be maintained.\n**3.** Use appropriate channels for listings and negotiations.\n**4.** Offers through authorised agents only.\n**5.** Advertising competing realty services is prohibited.' },
+      { name: '🏠 Property Rules', value: '**1.** Listings must include accurate descriptions and pricing.\n**2.** Properties must be inspected before listing.\n**3.** Commissions are standardised.\n**4.** Exclusive listings honoured for duration.\n**5.** All sales through official Z&E channels.' },
       { name: '📋 Agent Standards', value: '**1.** Agents must maintain active licensure.\n**2.** Conflicts of interest must be disclosed.\n**3.** Agents responsible for listing accuracy.\n**4.** Client funds follow trust accounting.\n**5.** Enquiry responses within 24 hours required.' },
       { name: '🚫 Prohibited', value: '**1.** Exploiting property system bugs is forbidden.\n**2.** Automation for property interactions is prohibited.\n**3.** RMT of properties or deeds is forbidden.\n**4.** OOC harassment is grounds for termination.\n**5.** Alt accounts to bypass ownership limits are prohibited.' }
     ] }
@@ -102,17 +112,17 @@ const PANELS = [
     ]
   },
   {
-    guildId: '1528809601674514502', color: 0x78281F,
-    title: 'Demeter Realty Leasing Office',
+    guildId: '1534966276290646027', color: 0x78281F,
+    title: 'Z&E Realty Leasing Office',
     description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
     options: [
-      { label: 'Support / Enquiry', value: 'demeter_support', modalId: 'spm_demeter_support',
+      { label: 'Support / Enquiry', value: 'ze_support', modalId: 'spm_ze_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
-      { label: 'Apply for Agent', value: 'demeter_agent', modalId: 'spm_demeter_agent',
+      { label: 'Apply for Agent', value: 'ze_agent', modalId: 'spm_ze_agent',
         fields: [F('ign', 'In-Game Name'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_agent', 'Why be an Agent?', P), F('bring', 'What do you bring to the team?', P)] },
-      { label: 'Buy a Plot', value: 'demeter_buy', modalId: 'spm_demeter_buy',
+      { label: 'Buy a Plot', value: 'ze_buy', modalId: 'spm_ze_buy',
         fields: [F('ign', 'In-Game Name'), F('location', 'Desired Location'), F('size', 'Plot Size'), F('budget', 'Budget'), F('use', 'Intended Use', P)] },
-      { label: 'Sell a Plot', value: 'demeter_sell', modalId: 'spm_demeter_sell',
+      { label: 'Sell a Plot', value: 'ze_sell', modalId: 'spm_ze_sell',
         fields: [F('ign', 'In-Game Name'), F('coords', 'Plot Coordinates'), F('price', 'Asking Price'), F('description', 'Property Description', P), F('screenshot', 'Screenshot Link', S, false)] }
     ]
   }
