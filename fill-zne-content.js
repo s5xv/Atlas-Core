@@ -24,17 +24,25 @@ const blocks = {
   ],
   '1534967617566146590': [
     ['Commands', [
-      '**/post_listing** — Post a property for sale \u203A location, price, near, description, image',
-      '**/contract buy** — Z&E buys from a seller \u203A seller (MC name), seller_user (@discord), location, price',
-      '**/contract sell** — Z&E sells to a buyer \u203A buyer (MC name), buyer_user (@discord), location, price',
-      '**/contract listing** — Client lists their plot with us \u203A seller, seller_user, location, price, listing_period',
-      '**/contract find** — Client hires us to find a plot \u203A client, client_user, location, price, search_period',
-      '**/sold** — Mark listing sold, calculates commission \u203A message (link), deal_type, total_price, plot_hunting?',
-      '**/calc_commission** — See 5% splits for any price',
-      '**/remove_listing** — Archive a listing',
-      '**/payout_request** — Submit proof for Broker review',
-      '**/payout_ledger** — (Broker) View amounts owed per agent',
-      '**/payout_history** — (Broker) View past payouts'
+      '**/post_listing** — Post a listing embed + thread in the plots channel (location, price, near, description, image) \u2014 pings New Listings, logs to audit',
+      '**/contract** — 4 subcommands, legal contracts. Agent auto-signs, other party clicks Sign',
+      '\u203A **buy** \u2014 seller, seller_user, location, price, deposit, closing_date \u2014 PPA where Z&E buys from a seller',
+      '\u203A **sell** \u2014 buyer, buyer_user, location, price, deposit, closing_date \u2014 PPA where Z&E sells to a buyer',
+      '\u203A **ersla_sell** \u2014 seller, seller_user, location, price, listing_period, commission \u2014 client lists their plot with Z&E',
+      '\u203A **ersla_find** \u2014 client, client_user, location, price, search_period, commission \u2014 client hires Z&E to find a plot',
+      '**/sold** — message, deal_type, total_price, buyer_name, contract_id, plot_hunting \u2014 marks sold (needs signed contract), greys embed, locks thread, calculates 5% split, logs it',
+      '**/remove_listing** — message \u2014 marks removed, greys embed, archives thread',
+      '**/calc_commission** — price \u2014 shows 5% pool and split options (solo/team/owner solo) + plot hunting fee',
+      '**/payout_request** — proof (image) \u2014 posts payout request with owed amount',
+      '**/payout_history** \u2014 (Broker) recent completed sales',
+      '**/payout_ledger** \u2014 (Broker) amount owed per agent, sorted',
+      '**/my_listings** \u2014 all your active listings',
+      '**/stats** \u2014 closed deals, commission earned, active listings, contracts signed',
+      '**/favorite** \u2014 add/remove/list + location/price \u2014 personal watchlist',
+      '**/feedback** \u2014 agent, rating (1-5), review \u2014 posts to ratings channel',
+      '**/help** \u2014 command categories via dropdown',
+      '**/contract_void** \u2014 contract_id, reason \u2014 (Broker) voids a signed contract',
+      '**/broadcast** \u2014 message \u2014 (Owner) DMs every agent'
     ].join('\n')],
     ['Rules', [
       'Only Realtors+ can use /post_listing, /sold, /remove_listing',
@@ -56,7 +64,8 @@ const blocks = {
   '1534967619466035421': [
     ['How It Works', [
       '• Track your deals with /contract and /sold',
-      '• Use /payout_request and attach proof (screenshots/logs)',
+      '• Use /payout_request and attach proof (image)',
+      '• Posts a payout request with your owed amount for Broker review',
       '• A Broker reviews your payout within 24 hours',
       '• Approved payouts are paid via the company weekly check',
       '• A ledger entry is logged for your records'
