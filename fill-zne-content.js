@@ -23,7 +23,7 @@ const blocks = {
     ['What are the community guidelines?', 'All users must strictly adhere to Discord TOS and Democracycraft TOS, avoid bug abuse, and maintain professional conduct.']
   ],
   '1534967617566146590': [
-    ['Commands', [
+    ['Commands (Listings & Contracts)', [
       '**/post_listing** — Post a listing embed + thread in the plots channel (location, price, near, description, image) \u2014 pings New Listings, logs to audit',
       '**/contract** — 4 subcommands, legal contracts. Agent auto-signs, other party clicks Sign',
       '\u203A **buy** \u2014 seller, seller_user, location, price, deposit, closing_date \u2014 PPA where Z&E buys from a seller',
@@ -32,7 +32,9 @@ const blocks = {
       '\u203A **ersla_find** \u2014 client, client_user, location, price, search_period, commission \u2014 client hires Z&E to find a plot',
       '**/sold** — message, deal_type, total_price, buyer_name, contract_id, plot_hunting \u2014 marks sold (needs signed contract), greys embed, locks thread, calculates 5% split, logs it',
       '**/remove_listing** — message \u2014 marks removed, greys embed, archives thread',
-      '**/calc_commission** — price \u2014 shows 5% pool and split options (solo/team/owner solo) + plot hunting fee',
+      '**/calc_commission** — price \u2014 shows 5% pool and split options (solo/team/owner solo) + plot hunting fee'
+    ].join('\n')],
+    ['Commands (Agent Tools)', [
       '**/payout_request** — proof (image) \u2014 posts payout request with owed amount',
       '**/payout_history** \u2014 (Broker) recent completed sales',
       '**/payout_ledger** \u2014 (Broker) amount owed per agent, sorted',
