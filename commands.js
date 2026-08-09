@@ -107,8 +107,8 @@ const PANELS = [
     options: [
       { label: 'Support / Enquiry', value: 'plutus_support', modalId: 'spm_plutus_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
-      { label: 'Apply for Teller', value: 'plutus_teller', modalId: 'spm_plutus_teller',
-        fields: [F('ign', 'In-Game Name'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_work', 'Why work here?', P), F('bring', 'What do you bring to the team?', P)] }
+      { label: 'Apply for a Job', value: 'plutus_teller', modalId: 'spm_plutus_teller',
+        fields: [F('ign', 'In-Game Name'), F('job', 'What job do you want?'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_work', 'Why work here?', P)] }
     ]
   },
   {
