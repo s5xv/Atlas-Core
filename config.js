@@ -10,16 +10,6 @@ module.exports = {
         { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
       ]
     },
-    "1528796628457361449": {
-      name: "Hermes Net", color: "#2980B9", staff_role_id: "STAFF_ROLE_ID",
-      member_role_id: "1528798225480286370", unverified_role_id: "",
-      category_id: "1528865513503985737", ticket_panel_channel_id: "PANEL_CHANNEL_ID", log_channel_id: "1528799387080462416", audit_channel_id: "1528799387080462416",
-      ticket_text: "Hermes Net support. State your issue or question below.",
-      notification_roles: [
-        { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
-        { label: "Event Pings", role_id: "EVENT_PING_ROLE_ID" }
-      ]
-    },
     "1528804420383674559": {
       name: "Plutus Bank", color: "#1E4620", staff_role_id: "STAFF_ROLE_ID",
       member_role_id: "1528804886597206243", unverified_role_id: "",
@@ -61,7 +51,7 @@ module.exports = {
 
   antispam: { maxMessages: 5, windowMs: 3000, timeoutDurationMs: 600000 },
 
-  tickets: { autoCloseHours: 24, maxPerUser: 3 },
+  tickets: { autoCloseHours: 0, maxPerUser: 3 },
 
   serverBlacklist: [],
 

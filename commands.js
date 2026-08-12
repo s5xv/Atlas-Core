@@ -14,7 +14,6 @@ const validId = s => typeof s === 'string' && /^\d{17,19}$/.test(s);
 
 const RULES_CHANNELS = {
   '1528793481273671832': '1528795598436962334',
-  '1528796628457361449': '1528798892139741286',
   '1528804420383674559': '1528807062094745812',
   '1528809601674514502': '1528840197796532294',
   '1534966276290646027': '1534967601019617411'
@@ -22,7 +21,6 @@ const RULES_CHANNELS = {
 
 const GUILD_PANEL_CHANNELS = {
   '1528793481273671832': '1528796269001183272',
-  '1528796628457361449': '1528799506122936502',
   '1528804420383674559': '1528807330433597451',
   '1528809601674514502': '1528841128982351872',
   '1534966276290646027': '1534967624440611006'
@@ -40,14 +38,6 @@ const RULES_DATA = {
       { name: '🏢 Business & Operations', value: '**1.** All transactions must be documented and reported to management.\n**2.** Employees must maintain activity. Extended absences require HR notification.\n**3.** Confidential information must not be shared with external parties.\n**4.** Company assets require approved purchasing pipeline for procurement.\n**5.** Failure to meet performance standards may result in demotion or termination.' },
       { name: '⚔️ Roleplay Standards', value: '**1.** Stay in-character while on company business. Mark OOC with (( )).\n**2.** New developments require board approval before execution.\n**3.** Corporate espionage requires explicit staff authorisation.\n**4.** All contracts must be honoured once signed.\n**5.** Use channels for their intended purpose only.' },
       { name: '🚫 Prohibited Actions', value: '**1.** Exploiting bugs or glitches for gain is strictly forbidden.\n**2.** Cheating software, macros, or automation tools are banned.\n**3.** Real-money trading of in-game items or currency is forbidden.\n**4.** OOC harassment or threats are grounds for immediate removal.\n**5.** Alt accounts to bypass bans or restrictions are prohibited.' }
-    ] },
-  '1528796628457361449': { color: 0x2980B9, title: 'Hermes Net — Official Rules & Regulations',
-    sections: [
-      { name: '📜 General Conduct', value: '**1.** All users must conduct themselves professionally at all times.\n**2.** Respect network operators and staff. Non-compliance may result in suspension.\n**3.** Impersonating Hermes Net employees or affiliates is prohibited.\n**4.** All communications are subject to monitoring for security.\n**5.** Meta-gaming and power-gaming are prohibited.' },
-      { name: '💬 Communication', value: '**1.** Maintain clear and respectful communication in all channels.\n**2.** Do not share DMs without consent of all parties.\n**3.** Use appropriate channels for your enquiry type.\n**4.** In-character voice is expected during RP scenarios.\n**5.** Advertising competing networks is prohibited.' },
-      { name: '🌐 Network Usage', value: '**1.** Network resources are for legitimate business use only.\n**2.** Unauthorised access to restricted systems will result in termination.\n**3.** Data interception without authorisation is strictly forbidden.\n**4.** Bandwidth-heavy activities degrading performance are not permitted.\n**5.** Network modifications require senior engineer approval.' },
-      { name: '⚔️ RP Standards', value: '**1.** All network-related RP scenarios must be realistic.\n**2.** Service interruptions should follow proper escalation procedures.\n**3.** Customer data privacy must be maintained in-character.\n**4.** Security incidents require immediate reporting.\n**5.** Repairs and maintenance must be logged.' },
-      { name: '🚫 Prohibited', value: '**1.** Exploiting network bugs is strictly forbidden.\n**2.** Macros or automation for network systems are prohibited.\n**3.** RMT of network services or equipment is forbidden.\n**4.** OOC harassment of customers or colleagues is grounds for dismissal.\n**5.** Alt accounts to evade restrictions are prohibited.' }
     ] },
   '1528804420383674559': { color: 0x1E4620, title: 'Plutus Bank — Official Rules & Regulations',
     sections: [
@@ -87,17 +77,6 @@ const PANELS = [
         fields: [F('ign', 'In-Game Name'), F('position', 'Position Applying For'), F('experience', 'Prior Experience', P), F('why_hire', 'Why hire you?', P), F('bring', 'What do you bring to the team?', P)] },
       { label: 'Sponsor / Promote', value: 'atlas_sponsor', modalId: 'spm_atlas_sponsor',
         fields: [F('ign_discord', 'Your IGN & Discord'), F('business', 'Business / Server Name'), F('type', 'Sponsorship or Promotion?'), F('details', 'Describe your offer in detail', P), F('budget', 'How much are you willing to sponsor?')] }
-    ]
-  },
-  {
-    guildId: '1528796628457361449', color: 0x2980B9,
-    title: 'Hermes Net Support Terminal',
-    description: 'Please choose the correct option below and fill out the form accurately. A member of our team will review your submission and assist you as soon as possible.',
-    options: [
-      { label: 'Support / Enquiry', value: 'hermes_support', modalId: 'spm_hermes_support',
-        fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
-      { label: 'Apply for Staff', value: 'hermes_staff', modalId: 'spm_hermes_staff',
-        fields: [F('ign', 'In-Game Name'), F('role', 'Desired Role'), F('experience', 'Prior Experience', P), F('why_hire', 'Why hire you?', P), F('bring', 'What do you bring to the team?', P)] }
     ]
   },
   {
@@ -332,6 +311,8 @@ async function createTicket(interaction, gc, info) {
 
 function resetTicketAutoClose(channelId, gc) {
   if (u.ticketTimeouts.has(channelId)) clearTimeout(u.ticketTimeouts.get(channelId));
+  u.ticketTimeouts.delete(channelId);
+  if (!config.tickets.autoCloseHours || config.tickets.autoCloseHours <= 0) return;
   const t = setTimeout(async () => {
     const ch = globalClient?.channels.cache.get(channelId);
     if (!ch || !u.tickets.has(channelId)) return;
@@ -1558,7 +1539,17 @@ async function extraSafeFollowUp(interaction, content) {
   try {
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({ content, ephemeral: true });
-    } else {
+} else if (interaction.guild.id === '1534966276290646027') { // Z&E Realty — brokers & managers only
+    overwrites.push(
+      { id: '1534967554446196869', allow: allowPerms }, // Principal Broker
+      { id: '1534967558896222400', allow: allowPerms }, // Managing Director
+      { id: '1534967563346251968', allow: allowPerms }, // Broker
+      { id: '1534966661084348498', allow: allowPerms }, // Server
+      { id: '1534967564411732020', deny: allowPerms },  // Realtor
+      { id: '1534967566584385596', deny: allowPerms },  // Junior Realtor
+      { id: '1534967568073359460', deny: allowPerms }   // Leasing Agent
+    );
+  } else {
       await interaction.reply({ content, ephemeral: true });
     }
   } catch (error) {
