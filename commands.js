@@ -1539,15 +1539,15 @@ async function extraSafeFollowUp(interaction, content) {
   try {
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({ content, ephemeral: true });
-} else if (interaction.guild.id === '1534966276290646027') { // Z&E Realty — brokers & managers only
+} else if (interaction.guild.id === '1534966276290646027') { // Z&E Realty — staff access
     overwrites.push(
       { id: '1534967554446196869', allow: allowPerms }, // Principal Broker
       { id: '1534967558896222400', allow: allowPerms }, // Managing Director
       { id: '1534967563346251968', allow: allowPerms }, // Broker
       { id: '1534966661084348498', allow: allowPerms }, // Server
-      { id: '1534967564411732020', deny: allowPerms },  // Realtor
-      { id: '1534967566584385596', deny: allowPerms },  // Junior Realtor
-      { id: '1534967568073359460', deny: allowPerms }   // Leasing Agent
+      { id: '1534967564411732020', allow: allowPerms }, // Realtor
+      { id: '1534967566584385596', allow: allowPerms }, // Junior Realtor
+      { id: '1534967568073359460', allow: allowPerms }  // Leasing Agent
     );
   } else {
       await interaction.reply({ content, ephemeral: true });
