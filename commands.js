@@ -87,7 +87,9 @@ const PANELS = [
       { label: 'Support / Enquiry', value: 'plutus_support', modalId: 'spm_plutus_support',
         fields: [F('ign', 'In-Game Name'), F('category', 'Enquiry Category'), F('desc', 'Detailed Description', P), F('evidence', 'Evidence Links', P, false)] },
       { label: 'Apply for a Job', value: 'plutus_teller', modalId: 'spm_plutus_teller',
-        fields: [F('ign', 'In-Game Name'), F('job', 'What job do you want?'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_work', 'Why work here?', P)] }
+        fields: [F('ign', 'In-Game Name'), F('job', 'What job do you want?'), F('playtime', 'Active Playtime'), F('experience', 'Prior Experience', P), F('why_work', 'Why work here?', P)] },
+      { label: 'Sponsor / Partner', value: 'plutus_sponsor', modalId: 'spm_plutus_sponsor',
+        fields: [F('ign_discord', 'Your IGN & Discord'), F('business', 'Business / Server Name'), F('type', 'Sponsorship or Partnership?'), F('details', 'Describe your offer in detail', P), F('budget', 'How much are you willing to invest?')] }
     ]
   },
   {
@@ -254,48 +256,23 @@ async function createTicket(interaction, gc, info) {
     if (gid === interaction.guild.id && ch && ch.permissionsFor(uid)?.has(PermissionsBitField.Flags.ViewChannel)) count++;
   });
   if (count >= config.tickets.maxPerUser) throw new Error('You already have ' + count + ' open tickets.');
-  const sanitized = interaction.user.username.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase().slice(0, 20);
-  const overwrites = [
-    { id: interaction.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
-    { id: uid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }
-  ];
-  if (validId(gc.staff_role_id)) overwrites.push({ id: gc.staff_role_id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] });
-  else u.findStaffRoles(interaction.guild).forEach(rid => overwrites.push({ id: rid, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory] }));
-  
-  // --- CONDITIONAL TICKET PERMISSIONS START ---
-  const sourceChannelId = interaction.channelId;
-  overwrites.length = 0; // Clear existing to enforce routing
-  
+const sanitized = interaction.user.username.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase().slice(0, 20);
+
+  // --- TICKET PERMISSIONS: follow the category, plus the opener ---
   const allowPerms = [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.AttachFiles, PermissionsBitField.Flags.EmbedLinks];
   const botPerms = [...allowPerms, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageMessages];
-
+  const overwrites = [];
+  const catCh = validId(gc.category_id) ? interaction.guild.channels.cache.get(gc.category_id) : null;
+  if (catCh) {
+    for (const ow of catCh.permissionOverwrites.cache.values()) {
+      overwrites.push({ id: ow.id, allow: [...ow.allow], deny: [...ow.deny] });
+    }
+  }
   overwrites.push(
-    { id: interaction.guild.roles.everyone.id, deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] },
     { id: interaction.user.id, allow: allowPerms },
     { id: interaction.client.user.id, allow: botPerms }
   );
-
-  if (sourceChannelId === '1533885991130235027') { // #🏧-loans
-    overwrites.push(
-      { id: '1528804776933064905', allow: allowPerms }, // Loan Officer
-      { id: '1528804643474509996', allow: allowPerms }  // Branch Manager
-    );
-  } else if (sourceChannelId === '1528807330433597451') { // #🎫-open-a-ticket
-    overwrites.push(
-      { id: '1531770145473560596', allow: allowPerms } // Teller
-    );
-  } else if (sourceChannelId === '1533904422558634106') { // Private Banking Panel
-    overwrites.push(
-      { id: '1528804643474509996', allow: allowPerms }, // Branch Manager
-      { id: '1528804473651068988', allow: allowPerms }  // Plutus Owner
-    );
-  } else {
-    // Safe fallback: only add if it's a valid cached role
-    if (gc.staff_role_id && interaction.guild.roles.cache.has(gc.staff_role_id)) {
-      overwrites.push({ id: gc.staff_role_id, allow: allowPerms });
-    }
-  }
-  // --- CONDITIONAL TICKET PERMISSIONS END ---
+  // --- TICKET PERMISSIONS END ---
 
   const chOpts = { name: 'ticket-' + sanitized, type: ChannelType.GuildText, permissionOverwrites: overwrites };
   if (validId(gc.category_id)) chOpts.parent = gc.category_id;
