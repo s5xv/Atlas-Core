@@ -21,6 +21,7 @@ const blocks = {
     ['Can I save plots or track prices on the site?', 'Yes \u2014 sign in with Discord (button in the top-right of the site) and use \u2605 Save on any property. Press "I\u2019m interested" and we DM you if that plot drops in price. You can also open a contract sign link from the portal with your Discord account.'],
     ['How do I apply to become a Realty Agent?', 'Open the Leasing Office support panel, choose **"Apply for Agent"** and fill out the application. A Broker reviews it and gets back to you.'],
     ['How do I apply as a Builder or Lead Builder?', 'Same place \u2014 open a ticket and choose the **Builder / Lead Builder** position. The Lead Builder assigns jobs and designs; builders get 50% of build profit (50% / 20% / 30% split when a Lead Builder assigns the job).'],
+    ['How do building services work?', 'Open a ticket and pick **"Request a Build"** \u2014 tell us the design, budget, plot location and style you want. We design the schematic and help you paste it in-game. Build prices start at $1,000+.'],
     ['How do I get general support?', 'Use the **"Support / Enquiry"** option in the support panel \u2014 a member of the team will pick up your ticket.'],
     ['What are the community guidelines?', 'All users must adhere to Discord TOS and Democracycraft TOS, avoid bug abuse, and maintain professional conduct at all times.']
   ],

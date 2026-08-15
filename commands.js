@@ -104,7 +104,9 @@ const PANELS = [
       { label: 'Buy a Plot', value: 'ze_buy', modalId: 'spm_ze_buy',
         fields: [F('ign', 'In-Game Name'), F('location', 'Desired Location'), F('size', 'Plot Size'), F('budget', 'Budget'), F('use', 'Intended Use', P)] },
       { label: 'Sell a Plot', value: 'ze_sell', modalId: 'spm_ze_sell',
-        fields: [F('ign', 'In-Game Name'), F('coords', 'Plot Coordinates'), F('price', 'Asking Price'), F('description', 'Property Description', P), F('screenshot', 'Screenshot Link', S, false)] }
+        fields: [F('ign', 'In-Game Name'), F('coords', 'Plot Coordinates'), F('price', 'Asking Price'), F('description', 'Property Description', P), F('screenshot', 'Screenshot Link', S, false)] },
+      { label: 'Request a Build', value: 'ze_build', modalId: 'spm_ze_build',
+        fields: [F('ign', 'In-Game Name'), F('design', 'What design do you want?', P), F('budget', 'Budget'), F('plot', 'Plot Location / Size'), F('style', 'Style (modern, medieval, etc.)'), F('deadline', 'Deadline (optional)', S, false)] }
     ]
   }
 ];
