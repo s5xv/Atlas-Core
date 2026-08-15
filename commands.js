@@ -774,7 +774,10 @@ async function handleSlash(interaction) {
         await interaction.deferReply(ereply);
         if (sub === 'claim') {
           if (!u.tickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Not a ticket channel.' });
-          if (!interaction.member.roles.cache.has(gc.staff_role_id) && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) return interaction.editReply({ content: 'Only staff can claim tickets.' });
+          const first = (await interaction.channel.messages.fetch({ limit: 1 })).first();
+          const openerId = first?.content ? (first.content.match(/<@(\d+)>/) || [])[1] : null;
+          if (openerId && openerId === interaction.user.id) return interaction.editReply({ content: 'You cannot claim your own ticket.' });
+          if (!interaction.member.permissionsIn(interaction.channel.id).has(PermissionsBitField.Flags.ViewChannel)) return interaction.editReply({ content: 'You need access to this ticket to claim it.' });
           if (u.claimedTickets.has(interaction.channel.id)) return interaction.editReply({ content: 'Already claimed by <@' + u.claimedTickets.get(interaction.channel.id) + '>.' });
           u.claimedTickets.set(interaction.channel.id, interaction.user.id);
           const existing = (await interaction.channel.messages.fetch({ limit: 10 })).find(m => m.embeds.length && m.embeds[0].title && m.embeds[0].title.startsWith('Ticket'));
@@ -1191,7 +1194,10 @@ async function handleButton(interaction) {
   }
   if (id === 'claim_ticket') {
     if (!u.tickets.has(interaction.channel.id)) return u.respond(interaction, 'Not a ticket.');
-    if (!interaction.member.roles.cache.has(gc.staff_role_id) && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) return u.respond(interaction, 'Only staff can claim tickets.');
+    const first = (await interaction.channel.messages.fetch({ limit: 1 })).first();
+    const openerId = first?.content ? (first.content.match(/<@(\d+)>/) || [])[1] : null;
+    if (openerId && openerId === interaction.user.id) return u.respond(interaction, 'You cannot claim your own ticket.');
+    if (!interaction.member.permissionsIn(interaction.channel.id).has(PermissionsBitField.Flags.ViewChannel)) return u.respond(interaction, 'You need access to this ticket to claim it.');
     if (u.claimedTickets.has(interaction.channel.id)) return u.respond(interaction, 'Already claimed by <@' + u.claimedTickets.get(interaction.channel.id) + '>.');
     u.claimedTickets.set(interaction.channel.id, interaction.user.id);
     const existing = (await interaction.channel.messages.fetch({ limit: 10 })).find(m => m.embeds.length && m.embeds[0].title && m.embeds[0].title.startsWith('Ticket'));
