@@ -51,7 +51,7 @@ module.exports = {
 
   antispam: { maxMessages: 5, windowMs: 3000, timeoutDurationMs: 600000 },
 
-  tickets: { autoCloseHours: 0, maxPerUser: 3 },
+  tickets: { autoCloseHours: 0 },
 
   serverBlacklist: [],
 

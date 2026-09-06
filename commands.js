@@ -252,12 +252,7 @@ async function sendRolePanel(channel, gc) {
 
 async function createTicket(interaction, gc, info) {
   const uid = interaction.user.id;
-  let count = 0;
-  u.tickets.forEach((gid, cid) => {
-    const ch = interaction.guild.channels.cache.get(cid);
-    if (gid === interaction.guild.id && ch && ch.permissionsFor(uid)?.has(PermissionsBitField.Flags.ViewChannel)) count++;
-  });
-  if (count >= config.tickets.maxPerUser) throw new Error('You already have ' + count + ' open tickets.');
+
 const sanitized = interaction.user.username.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase().slice(0, 20);
 
   // --- TICKET PERMISSIONS: follow the category, plus the opener ---
