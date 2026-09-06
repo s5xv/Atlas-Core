@@ -250,16 +250,18 @@ async function sendRolePanel(channel, gc) {
   return channel.send({ embeds: [e], components: rows });
 }
 
-async function createTicket(interaction, gc, info) {
+async function createTicket(interaction, gc, info, overrideCategoryId) {
   const uid = interaction.user.id;
 
 const sanitized = interaction.user.username.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase().slice(0, 20);
+
+  const categoryId = overrideCategoryId || gc.category_id;
 
   // --- TICKET PERMISSIONS: follow the category, plus the opener ---
   const allowPerms = [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.AttachFiles, PermissionsBitField.Flags.EmbedLinks];
   const botPerms = [...allowPerms, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageMessages];
   const overwrites = [];
-  const catCh = validId(gc.category_id) ? interaction.guild.channels.cache.get(gc.category_id) : null;
+  const catCh = validId(categoryId) ? interaction.guild.channels.cache.get(categoryId) : null;
   if (catCh) {
     for (const ow of catCh.permissionOverwrites.cache.values()) {
       overwrites.push({ id: ow.id, allow: [...ow.allow], deny: [...ow.deny] });
@@ -272,7 +274,7 @@ const sanitized = interaction.user.username.replace(/[^a-zA-Z0-9-]/g, '').toLowe
   // --- TICKET PERMISSIONS END ---
 
   const chOpts = { name: 'ticket-' + sanitized, type: ChannelType.GuildText, permissionOverwrites: overwrites };
-  if (validId(gc.category_id)) chOpts.parent = gc.category_id;
+  if (validId(categoryId)) chOpts.parent = categoryId;
   const ch = await interaction.guild.channels.create(chOpts);
   u.tickets.set(ch.id, interaction.guild.id);
   const embed = new EmbedBuilder().setColor(gc.color).setTitle('Ticket - ' + (interaction.user.username)).setDescription(info || gc.ticket_text);
@@ -1610,7 +1612,7 @@ async function extraEndGiveaway(messageId) {
   }
 }
 
-async function extraCreateTicketFromButton(interaction, info) {
+async function extraCreateTicketFromButton(interaction, info, overrideCategoryId) {
   console.log(
     '[ExtraFeatures] Creating ticket:',
     info,
@@ -1630,7 +1632,7 @@ async function extraCreateTicketFromButton(interaction, info) {
     return null;
   }
 
-  const ch = await createTicket(interaction, gc, info).catch(async error => {
+  const ch = await createTicket(interaction, gc, info, overrideCategoryId).catch(async error => {
     console.error('[ExtraFeatures] createTicket failed:', error);
     await extraSafeFollowUp(
       interaction,
@@ -1705,7 +1707,8 @@ async function handleExtraFeatures(interaction) {
 
     const ch = await extraCreateTicketFromButton(
       interaction,
-      'Loan Support Ticket'
+      'Loan Support Ticket',
+      '1546113324242968586'
     );
 
     if (!ch) return true;
