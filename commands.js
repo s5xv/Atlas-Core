@@ -1440,7 +1440,7 @@ async function exportServerConfig(guild, type) {
   return lines.join('\n');
 }
 
-module.exports = { handleMessageCreate, handleInteractionCreate, handleMessageUpdate, handleMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handleReady, exportServerConfig };
+module.exports = { handleMessageCreate, handleInteractionCreate, handleMessageUpdate, handleMessageDelete, handleGuildMemberAdd, handleGuildMemberRemove, handleVoiceStateUpdate, handleReady, exportServerConfig, sendApplicationsPanel };
 
 
 
@@ -1463,6 +1463,71 @@ const BRANCH_MANAGER_ROLE_ID = '1528804643474509996';
 const PLUTUS_OWNER_ROLE_ID = '1528804473651068988';
 
 const PRIVATE_BANK_CATEGORY_NAME = '🏦 Private Banking';
+
+// --- Account Applications panel (staff only) ---
+const APPLICATIONS_CATEGORY_ID = '1553389439919722596';
+const BANK_DIRECTOR_ROLE_ID = PLUTUS_OWNER_ROLE_ID; // "Bank Director"
+const APPLICATION_STAFF_ROLES = [BRANCH_MANAGER_ROLE_ID, BANK_DIRECTOR_ROLE_ID];
+const APPLICATION_SELECT_ID = 'account_app_select';
+
+const APPLICATION_TYPES = {
+  private_banking: {
+    modalId: 'app_private_banking',
+    modalTitle: 'Private Banking Application',
+    heading: '📕 **Private Banking Account Application**',
+    fields: [
+      { id: 'ign', label: 'In-Game Name', style: TextInputStyle.Short, required: true },
+      { id: 'deposit', label: 'Expected Initial Deposit', style: TextInputStyle.Short, required: true },
+      { id: 'use', label: 'What will the account be used for?', style: TextInputStyle.Paragraph, required: true },
+      { id: 'notes', label: 'Additional Notes (optional)', style: TextInputStyle.Paragraph, required: false },
+    ],
+  },
+  rich_savings: {
+    modalId: 'app_rich_savings',
+    modalTitle: 'Rich Savings Application',
+    heading: '🐖 **Rich Savings Account Application**',
+    fields: [
+      { id: 'ign', label: 'In-Game Name', style: TextInputStyle.Short, required: true },
+      { id: 'goal', label: 'Savings Goal', style: TextInputStyle.Short, required: true },
+      { id: 'monthly', label: 'Estimated Monthly Deposits', style: TextInputStyle.Short, required: true },
+      { id: 'purpose', label: 'Purpose of the Savings (optional)', style: TextInputStyle.Paragraph, required: false },
+    ],
+  },
+};
+
+function canAccessApplications(interaction) {
+  const member = interaction.member;
+  if (!member) return false;
+  if (member.permissions?.has?.(ExtraPermissionsBitField.Flags.Administrator)) return true;
+  return APPLICATION_STAFF_ROLES.some(id => member.roles?.cache?.has(id));
+}
+
+function sendApplicationsPanel(channel) {
+  const embed = new ExtraEmbedBuilder()
+    .setColor(0x1E4620)
+    .setTitle('Account Applications')
+    .setDescription([
+      'Open an application ticket to interview a **Private Banking** or **Rich Savings** account applicant.',
+      '',
+      '🔒 **Restricted access** — Branch Managers and Bank Directors only.',
+      '',
+      '**How it works**',
+      '**1.** Pick an account type below — a ticket opens in **🍎 Applications**.',
+      '**2.** Interview the applicant inside the ticket (`/ticket add` brings them in).',
+      '**3.** Note the decision and close the ticket once it is approved or declined.',
+    ].join('\n'))
+    .setFooter({ text: 'Plutus Banking • Applications' });
+
+  const select = new StringSelectMenuBuilder()
+    .setCustomId(APPLICATION_SELECT_ID)
+    .setPlaceholder('Choose an account type')
+    .addOptions(
+      { label: 'Private Banking', description: 'High-value account with dedicated management', value: 'private_banking' },
+      { label: 'Rich Savings', description: 'Premium savings account with tiered interest', value: 'rich_savings' },
+    );
+
+  return channel.send({ embeds: [embed], components: [new ExtraActionRowBuilder().addComponents(select)] });
+}
 
 const extraGiveaways = new Map();
 
@@ -1521,17 +1586,7 @@ async function extraSafeFollowUp(interaction, content) {
   try {
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({ content, ephemeral: true });
-} else if (interaction.guild.id === '1534966276290646027') { // Z&E Realty — staff access
-    overwrites.push(
-      { id: '1534967554446196869', allow: allowPerms }, // Principal Broker
-      { id: '1534967558896222400', allow: allowPerms }, // Managing Director
-      { id: '1534967563346251968', allow: allowPerms }, // Broker
-      { id: '1534966661084348498', allow: allowPerms }, // Server
-      { id: '1534967564411732020', allow: allowPerms }, // Realtor
-      { id: '1534967566584385596', allow: allowPerms }, // Junior Realtor
-      { id: '1534967568073359460', allow: allowPerms }  // Leasing Agent
-    );
-  } else {
+    } else {
       await interaction.reply({ content, ephemeral: true });
     }
   } catch (error) {
@@ -1795,6 +1850,102 @@ async function handleExtraFeatures(interaction) {
       `Private Banking ticket created: ${ch}\nUse \`/ticket add\` to add users manually.`
     );
 
+    return true;
+  }
+
+  // --- Account Applications: pick account type -> modal ---
+  if (
+    interaction.isStringSelectMenu?.() &&
+    interaction.customId === APPLICATION_SELECT_ID
+  ) {
+    if (!canAccessApplications(interaction)) {
+      await interaction
+        .reply({
+          content:
+            'Only **Branch Managers** and **Bank Directors** can open an account application.',
+          ephemeral: true,
+        })
+        .catch(() => {});
+      return true;
+    }
+
+    const type = APPLICATION_TYPES[interaction.values[0]];
+    if (!type) {
+      await interaction
+        .reply({ content: 'Unknown application type.', ephemeral: true })
+        .catch(() => {});
+      return true;
+    }
+
+    const modal = new ModalBuilder().setCustomId(type.modalId).setTitle(type.modalTitle);
+    type.fields.forEach(f =>
+      modal.addComponents(
+        new ExtraActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId(f.id)
+            .setLabel(f.label)
+            .setStyle(f.style)
+            .setRequired(f.required),
+        ),
+      ),
+    );
+
+    return interaction.showModal(modal);
+  }
+
+  // --- Account Applications: form submitted -> open interview ticket ---
+  const appKey = Object.keys(APPLICATION_TYPES).find(
+    k => APPLICATION_TYPES[k].modalId === interaction.customId,
+  );
+  if (interaction.isModalSubmit?.() && appKey) {
+    if (!canAccessApplications(interaction)) {
+      await interaction
+        .reply({
+          content:
+            'Only **Branch Managers** and **Bank Directors** can open an account application.',
+          ephemeral: true,
+        })
+        .catch(() => {});
+      return true;
+    }
+
+    const type = APPLICATION_TYPES[appKey];
+    const values = {};
+    type.fields.forEach(f => {
+      values[f.id] = interaction.fields.getTextInputValue(f.id);
+    });
+
+    const info = [
+      type.heading,
+      '',
+      ...type.fields
+        .filter(f => values[f.id])
+        .map(f => '**' + f.label + ':** ' + values[f.id]),
+      '',
+      '> Interview the applicant in this ticket — use `/ticket add @user` to give them access.',
+    ].join('\n');
+
+    const ch = await extraCreateTicketFromButton(
+      interaction,
+      info,
+      APPLICATIONS_CATEGORY_ID,
+    );
+    if (!ch) return true;
+
+    // Private to Branch Managers, Bank Directors, the opener and the bot.
+    await extraApplyOverwrites(interaction, ch, APPLICATION_STAFF_ROLES);
+
+    const safe =
+      (values.ign || interaction.user.username)
+        .replace(/[^a-zA-Z0-9-]/g, '')
+        .toLowerCase()
+        .slice(0, 20) || 'applicant';
+    await ch.setName('application-' + safe).catch(() => {});
+
+    await extraSafeFollowUp(
+      interaction,
+      `Application ticket opened: ${ch}\nBring the applicant in with \`/ticket add\`.`,
+    );
     return true;
   }
 
