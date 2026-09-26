@@ -13,7 +13,7 @@ module.exports = {
     "1528804420383674559": {
       name: "Plutus Bank", color: "#1E4620", staff_role_id: "STAFF_ROLE_ID",
       member_role_id: "1528804886597206243", unverified_role_id: "",
-      category_id: "1553389439919722596", ticket_panel_channel_id: "PANEL_CHANNEL_ID", log_channel_id: "1528807272724172820", audit_channel_id: "1528807272724172820",
+      category_id: "1528865352568541224", ticket_panel_channel_id: "PANEL_CHANNEL_ID", log_channel_id: "1528807272724172820", audit_channel_id: "1528807272724172820",
       ticket_text: "Plutus Bank support. State your question or report below.",
       notification_roles: [
         { label: "Update Pings", role_id: "UPDATE_PING_ROLE_ID" },
