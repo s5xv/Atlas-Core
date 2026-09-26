@@ -1,4 +1,17 @@
 module.exports = {
+  // ---------------------------------------------------------------------------
+  // TICKET CATEGORIES
+  //
+  // `category_id` below is the DEFAULT category for EVERY ticket in that guild:
+  // the support panel, /ticket, reports, application forms, etc. Changing it
+  // moves ALL of that guild's tickets — not just one panel.
+  //
+  // A panel that needs its own category must pass it explicitly as the
+  // `overrideCategoryId` argument to createTicket(). Already done for:
+  //   APPLICATIONS_CATEGORY_ID  -> Account Applications panel (commands.js)
+  //   '1546113324242968586'     -> loan tickets (open_loan_ticket)
+  //   PRIVATE_BANK_CATEGORY_NAME-> private banking (matched by category name)
+  // ---------------------------------------------------------------------------
   guilds: {
     "1528793481273671832": {
       name: "Atlas Holdings", color: "#D4AF37", staff_role_id: "STAFF_ROLE_ID",
